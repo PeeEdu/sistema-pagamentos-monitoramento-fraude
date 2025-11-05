@@ -1,0 +1,176 @@
+version: "3.9"
+
+services:
+  # ==========================
+  # PostgreSQL - USER SERVICE
+  # ==========================
+  postgres_user:
+    image: postgres:16
+    container_name: postgres_user
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: user_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_user_data:/var/lib/postgresql/data
+    networks:
+      - mensageria-net
+
+  # ==========================
+  # PostgreSQL - BANK ACCOUNT SERVICE
+  # ==========================
+  postgres_bank:
+    image: postgres:16
+    container_name: postgres_bank
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bank_account_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_bank_data:/var/lib/postgresql/data
+    networks:
+      - mensageria-net
+
+  # ==========================
+  # MongoDB - TRANSFER SERVICE
+  # ==========================
+  mongo_transfer:
+    image: mongo:7
+    container_name: mongo_transfer
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo_transfer_data:/data/db
+    networks:
+      - mensageria-net
+
+  # ==========================
+  # MongoDB - NOTIFICATION SERVICE
+  # ==========================
+  mongo_notifications:
+    image: mongo:7
+    container_name: mongo_notifications
+    ports:
+      - "27019:27017"
+    volumes:
+      - mongo_notifications_data:/data/db
+    networks:
+      - mensageria-net
+
+  # ==========================
+  # RabbitMQ - Mensageria
+  # ==========================
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    networks:
+      - mensageria-net
+
+  # ==========================
+  # USER SERVICE
+  # ==========================
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    depends_on:
+      - postgres_user
+      - rabbitmq
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_user:5432/user_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: admin
+      SPRING_RABBITMQ_PASSWORD: admin
+    ports:
+      - "8080:8080"
+    networks:
+      - mensageria-net
+
+  # ==========================
+  # BANK ACCOUNT SERVICE
+  # ==========================
+  bank-account-service:
+    build: ./bank-account-service
+    container_name: bank-account-service
+    depends_on:
+      - postgres_bank
+      - rabbitmq
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_bank:5432/bank_account_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: admin
+      SPRING_RABBITMQ_PASSWORD: admin
+    ports:
+      - "8081:8080"
+    networks:
+      - mensageria-net
+
+  # ==========================
+  # TRANSFER SERVICE
+  # ==========================
+  transfer-service:
+    build: ./transfer-service
+    container_name: transfer-service
+    depends_on:
+      - mongo_transfer
+      - rabbitmq
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongo_transfer:27017/transfer_db
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: admin
+      SPRING_RABBITMQ_PASSWORD: admin
+    ports:
+      - "8082:8080"
+    networks:
+      - mensageria-net
+
+  # ==========================
+  # NOTIFICATION SERVICE
+  # ==========================
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    depends_on:
+      - mongo_notifications
+      - rabbitmq
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongo_notifications:27017/notifications_db
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: admin
+      SPRING_RABBITMQ_PASSWORD: admin
+    ports:
+      - "8083:8080"
+    networks:
+      - mensageria-net
+
+# ==========================
+# Volumes Persistentes
+# ==========================
+volumes:
+  postgres_user_data:
+  postgres_bank_data:
+  mongo_transfer_data:
+  mongo_notifications_data:
+
+# ==========================
+# Rede Compartilhada
+# ==========================
+networks:
+  mensageria-net:

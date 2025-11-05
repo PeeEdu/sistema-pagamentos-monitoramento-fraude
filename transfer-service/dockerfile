@@ -1,0 +1,35 @@
+# ==========================
+# Stage 1: Build do JAR
+# ==========================
+FROM eclipse-temurin:21-jdk AS build
+
+WORKDIR /app
+
+# Copia arquivos do Gradle
+COPY build.gradle settings.gradle gradlew ./
+COPY gradle gradle
+
+# Copia o código fonte
+COPY src src
+
+# Permite executar o wrapper
+RUN chmod +x ./gradlew
+
+# Gera o JAR sem rodar testes
+RUN ./gradlew clean bootJar -x test
+
+# ==========================
+# Stage 2: Imagem final
+# ==========================
+FROM eclipse-temurin:21-jdk
+
+WORKDIR /app
+
+# Copia o JAR gerado na stage anterior
+COPY --from=build /app/build/libs/*-service-*.jar app.jar
+
+# Expõe porta padrão do Spring Boot
+EXPOSE 8080
+
+# Comando de inicialização
+ENTRYPOINT ["java", "-jar", "app.jar"]
