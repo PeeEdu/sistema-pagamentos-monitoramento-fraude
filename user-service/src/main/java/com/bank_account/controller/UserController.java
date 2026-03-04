@@ -36,6 +36,10 @@ public record UserController(
     }
 
     @GetMapping
+    @Operation(
+            summary = "Lista todos os usuários",
+            description = "Lista todos os usuários cadastrados do sistema bancário"
+    )
     public ResponseEntity<BaseResponse<List<UserResponse>>> findAll(){
         final var users = userService.findAll();
 
@@ -46,6 +50,10 @@ public record UserController(
     }
 
     @GetMapping("/{id}")
+    @Operation(
+            summary = "Lista um usuário por ID",
+            description = "Lista um usuário pelo ID fornecido"
+    )
     public ResponseEntity<BaseResponse<UserResponse>> getUserById(@PathVariable("id") String id){
         final var user = userService.findUserById(id);
 
