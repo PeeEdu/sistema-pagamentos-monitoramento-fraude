@@ -4,12 +4,13 @@ server:
 spring:
   application:
     name: notification-service
+
   data:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI:mongodb://admin:admin123@localhost:27017/notification_db?authSource=admin}
 
   kafka:
-    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
     consumer:
       group-id: notification-group
       auto-offset-reset: earliest
@@ -22,8 +23,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${EMAIL_USERNAME:estudosti877@gmail.com}
-    password: ${EMAIL_PASSWORD:512703@3261@P@trolla1}
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}  # ⚠️ NUNCA commite senha real!
     properties:
       mail:
         smtp:
@@ -35,7 +36,12 @@ spring:
           timeout: 5000
           writetimeout: 5000
 
-# Logging
+# Tópicos Kafka
+kafka:
+  topics:
+    user-created: ${KAFKA_TOPIC_USER_CREATED:user-created-topic}
+    transaction-notification: ${KAFKA_TOPIC_TRANSACTION_NOTIFICATION:transaction-notification-topic}
+
 logging:
   level:
     root: INFO

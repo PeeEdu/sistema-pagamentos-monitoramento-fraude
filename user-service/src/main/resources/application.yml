@@ -17,7 +17,6 @@ spring:
       properties:
         spring.json.add.type.headers: false
 
-# Logging
 logging:
   level:
     root: INFO

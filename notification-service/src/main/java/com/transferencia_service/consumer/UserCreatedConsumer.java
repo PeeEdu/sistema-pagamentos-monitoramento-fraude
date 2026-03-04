@@ -4,6 +4,7 @@ import com.transferencia_service.event.UserCreatedEvent;
 import com.transferencia_service.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
@@ -17,23 +18,29 @@ public class UserCreatedConsumer {
 
     private final NotificationService notificationService;
 
+    @Value("${kafka.topics.user-created}")
+    private String userCreatedTopic;
+
     @KafkaListener(
-            topics = "user-created-topic",
-            groupId = "notification-group",
+            topics = "${kafka.topics.user-created}",  // ✅ Lê do application.yml
+            groupId = "${spring.kafka.consumer.group-id}",
             containerFactory = "kafkaListenerContainerFactory"
     )
     public void consume(
             @Payload UserCreatedEvent event,
             @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
-            @Header(KafkaHeaders.OFFSET) long offset
+            @Header(KafkaHeaders.OFFSET) long offset,
+            @Header(KafkaHeaders.RECEIVED_TOPIC) String topic
     ) {
-        log.info("Mensagem recebida - Partition: {}, Offset: {}, Event: {}",
-                partition, offset, event);
+        log.info("📨 Mensagem recebida do tópico: {} - Partition: {}, Offset: {}",
+                topic, partition, offset);
+        log.info("📧 Evento: {}", event);
 
         try {
             notificationService.processUserCreatedEvent(event);
+            log.info("✅ Notificação processada com sucesso para: {}", event.getEmail());
         } catch (Exception e) {
-            log.error("Erro ao processar evento: {}", event, e);
+            log.error("❌ Erro ao processar evento: {}", event, e);
         }
     }
 }
