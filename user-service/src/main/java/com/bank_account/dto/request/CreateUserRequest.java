@@ -29,6 +29,5 @@ public record CreateUserRequest(
         @NotBlank
         @Pattern(regexp = "^\\+?[1-9][0-9]*$", message = "Telefone precisa ser válido")
         String phone
-
 ) {
 }
