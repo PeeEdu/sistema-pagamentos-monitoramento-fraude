@@ -1,4 +1,4 @@
-package com.transferencia_service;
+package main.java.com.transferencia_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

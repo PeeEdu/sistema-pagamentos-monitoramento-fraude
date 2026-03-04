@@ -2,26 +2,32 @@ package com.bank_account.mapper;
 
 import com.bank_account.dto.request.CreateUserRequest;
 import com.bank_account.dto.response.UserCreateResponse;
-import com.bank_account.entities.User;
+import com.bank_account.dto.response.UserResponse;
+import com.bank_account.entities.UserEntity;
+import org.mapstruct.*;
 
-public class UserMapper {
-    public static User toEntity(final CreateUserRequest createUserRequest) {
-        return User.builder()
-                .name(createUserRequest.name())
-                .email(createUserRequest.email())
-                .phone(createUserRequest.phone())
-                .address(createUserRequest.address())
-                .password(createUserRequest.password())
-                .build();
-    }
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+public interface UserMapper {
 
-    public static UserCreateResponse toResponse(final User user) {
-        return UserCreateResponse.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .phone(user.getPhone())
-                .address(user.getAddress())
-                .build();
-    }
+
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "email", source = "email")
+    @Mapping(target = "phone", source = "phone")
+    UserCreateResponse toCreateResponse(UserEntity userEntity);
+
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "email", source = "email")
+    @Mapping(target = "password", source = "password")
+    @Mapping(target = "cpf", source = "cpf")
+    @Mapping(target = "phone", source = "phone")
+    @Mapping(target = "createdAt", source = "createdAt")
+    @Mapping(target = "updatedAt", source = "updatedAt")
+    UserResponse toResponse(UserEntity userEntity);
+
+    UserEntity toEntity(CreateUserRequest createUserRequest);
+
 }

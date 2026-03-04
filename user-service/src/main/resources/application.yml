@@ -2,20 +2,24 @@ server:
   port: 8080
 
 spring:
-  datasource:
-    url: jdbc:postgresql://postgres_user:5432/user_db
-    username: postgres
-    password: postgres
-    driver-class-name: org.postgresql.Driver
+  application:
+    name: user-service
 
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    show-sql: true
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://admin:admin123@localhost:27017/user_db?authSource=admin}
 
-  rabbitmq:
-    host: rabbitmq
-    port: 5672
-    username: admin
-    password: admin
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+
+# Logging
+logging:
+  level:
+    root: INFO
+    org.springframework.kafka: DEBUG
+    com.bank_account: DEBUG
