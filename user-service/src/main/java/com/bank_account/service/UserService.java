@@ -7,6 +7,7 @@ import com.bank_account.entities.UserEntity;
 import com.bank_account.exceptions.UserAlreadyExistsException;
 import com.bank_account.exceptions.UserNotFoundException;
 import com.bank_account.mapper.UserMapper;
+import com.bank_account.producer.UserEventProducer;
 import com.bank_account.repository.UserRepository;
 import com.bank_account.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
@@ -27,16 +28,21 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final UserValidator userValidator;
+    private final UserEventProducer userEventProducer;
 
     public UserCreateResponse createUser(final CreateUserRequest createUserRequest) {
         final UserEntity userEntity = userMapper.toEntity(createUserRequest);
 
         userValidator.validateCpfNotExists(createUserRequest.cpf());
+        userValidator.validateEmailNotExists(createUserRequest.email());
 
         log.info("Creating user: {}", userEntity);
-        userRepository.save(userEntity);
+        var savedUser = userRepository.save(userEntity);
 
-        return userMapper.toCreateResponse(userEntity);
+        var event = userMapper.toUserCreatedEvent(savedUser);
+        userEventProducer.sendUserCreatedEvent(event);
+
+        return userMapper.toCreateResponse(savedUser);
     }
 
     public List<UserResponse> findAll(){

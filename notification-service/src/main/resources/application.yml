@@ -1,13 +1,44 @@
 server:
-  port: 8083
+  port: 8081
 
 spring:
+  application:
+    name: notification-service
+
   data:
     mongodb:
-      uri: mongodb://mongo_notifications:27017/notifications_db
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://admin:admin123@localhost:27017/notification_db?authSource=admin}
 
-  rabbitmq:
-    host: rabbitmq
-    port: 5672
-    username: admin
-    password: admin
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: notification-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.value.default.type: com.bank_account.notificationservice.event.UserCreatedEvent
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USERNAME:seu-email@gmail.com}
+    password: ${EMAIL_PASSWORD:sua-senha-app}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+# Logging
+logging:
+  level:
+    root: INFO
+    org.springframework.kafka: DEBUG
+    com.bank_account: DEBUG
