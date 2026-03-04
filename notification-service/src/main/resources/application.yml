@@ -4,7 +4,6 @@ server:
 spring:
   application:
     name: notification-service
-
   data:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI:mongodb://admin:admin123@localhost:27017/notification_db?authSource=admin}
@@ -23,8 +22,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${EMAIL_USERNAME:seu-email@gmail.com}
-    password: ${EMAIL_PASSWORD:sua-senha-app}
+    username: ${EMAIL_USERNAME:estudosti877@gmail.com}
+    password: ${EMAIL_PASSWORD:512703@3261@P@trolla1}
     properties:
       mail:
         smtp:

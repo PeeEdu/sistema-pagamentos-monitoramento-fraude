@@ -31,10 +31,7 @@ public class NotificationService {
                 .build();
 
         try {
-            // Envia o email
             emailService.sendWelcomeEmail(event.getEmail(), event.getName());
-
-            // Atualiza o log como sucesso
             notificationLog.setStatus("SUCCESS");
             notificationLog.setSentAt(LocalDateTime.now());
 
@@ -42,12 +39,9 @@ public class NotificationService {
 
         } catch (Exception e) {
             log.error("Erro ao enviar notificação para: {}", event.getEmail(), e);
-
-            // Atualiza o log como falha
             notificationLog.setStatus("FAILED");
             notificationLog.setErrorMessage(e.getMessage());
         } finally {
-            // Salva o log no MongoDB
             notificationLogRepository.save(notificationLog);
         }
     }
