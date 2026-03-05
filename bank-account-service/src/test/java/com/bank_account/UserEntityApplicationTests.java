@@ -1,10 +1,10 @@
-package com.transferencia_service;
+package test.java.com.bank_account;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class DesafioMensageriaApplicationTests {
+class TransferEntityApplicationTests {
 
 	@Test
 	void contextLoads() {

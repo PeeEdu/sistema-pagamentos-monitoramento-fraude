@@ -28,7 +28,8 @@ public class UserEntity {
 
 
     @CreatedDate
-    private Instant createdAt;
+    @Builder.Default
+    private Instant createdAt = Instant.now();
 
     @LastModifiedDate
     private Instant updatedAt;

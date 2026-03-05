@@ -2,13 +2,11 @@ package com.bank_account.event;
 
 import lombok.*;
 
+@Builder
 @Getter
 @Setter
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class UserCreatedEvent {
+@NoArgsConstructor
+public class CreateBankAccountEvent {
     private String userId;
-    private String name;
-    private String email;
 }

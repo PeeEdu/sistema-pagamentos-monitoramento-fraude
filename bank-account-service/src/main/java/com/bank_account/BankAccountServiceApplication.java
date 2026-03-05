@@ -1,13 +1,11 @@
-package main.java.com.transferencia_service;
+package com.bank_account;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class DesafioMensageriaApplication {
-
+public class BankAccountServiceApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(DesafioMensageriaApplication.class, args);
+		SpringApplication.run(BankAccountServiceApplication.class, args);
 	}
-
 }

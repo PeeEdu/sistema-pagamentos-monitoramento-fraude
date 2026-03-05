@@ -4,10 +4,18 @@ import com.bank_account.dto.request.CreateUserRequest;
 import com.bank_account.dto.response.UserCreateResponse;
 import com.bank_account.dto.response.UserResponse;
 import com.bank_account.entities.UserEntity;
+import com.bank_account.event.CreateBankAccountEvent;
 import com.bank_account.event.UserCreatedEvent;
+import com.bank_account.producer.BankAccountEventProducer;
 import org.mapstruct.*;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+import java.time.Instant;
+
+@Mapper(
+        componentModel = MappingConstants.ComponentModel.SPRING,
+        injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+        imports = Instant.class
+)
 public interface UserMapper {
 
 
@@ -33,9 +41,15 @@ public interface UserMapper {
     @Mapping(target = "userId", source = "id")
     @Mapping(target = "name", source = "name")
     @Mapping(target = "email", source = "email")
-    @Mapping(target = "cpf", source = "cpf")
     UserCreatedEvent toUserCreatedEvent(UserEntity userEntity);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)  // MongoDB cuida disso
+    @Mapping(target = "updatedAt", ignore = true)
     UserEntity toEntity(CreateUserRequest createUserRequest);
+
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "userId", source = "userId")
+    CreateBankAccountEvent toBankAccountCreateEvent(UserEntity userEntity);
 
 }

@@ -224,60 +224,6 @@ services:
     restart: unless-stopped
 
   # ==========================
-  # BANK ACCOUNT SERVICE
-  # ==========================
-  bank-account-service:
-    build: ./bank-account-service
-    container_name: bank-account-service
-    depends_on:
-      mongodb:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    environment:
-      SPRING_DATA_MONGODB_URI: mongodb://admin:admin123@mongodb:27017/bank_account_db?authSource=admin
-      SPRING_DATA_REDIS_HOST: redis
-      SPRING_DATA_REDIS_PORT: 6379
-      SPRING_DATA_REDIS_PASSWORD: redis123
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      ZEEBE_CLIENT_BROKER_GATEWAY_ADDRESS: zeebe:26500
-    ports:
-      - "8083:8080"
-    networks:
-      - app-network
-    restart: unless-stopped
-
-  # ==========================
-  # TRANSFER SERVICE
-  # ==========================
-  transfer-service:
-    build: ./transfer-service
-    container_name: transfer-service
-    depends_on:
-      mongodb:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      zeebe:
-        condition: service_healthy
-    environment:
-      SPRING_DATA_MONGODB_URI: mongodb://admin:admin123@mongodb:27017/transfer_db?authSource=admin
-      SPRING_DATA_REDIS_HOST: redis
-      SPRING_DATA_REDIS_PORT: 6379
-      SPRING_DATA_REDIS_PASSWORD: redis123
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      ZEEBE_CLIENT_BROKER_GATEWAY_ADDRESS: zeebe:26500
-    ports:
-      - "8084:8080"
-    networks:
-      - app-network
-    restart: unless-stopped
-
-  # ==========================
   # NOTIFICATION SERVICE
   # ==========================
   notification-service:

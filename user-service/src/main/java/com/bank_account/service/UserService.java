@@ -7,6 +7,7 @@ import com.bank_account.entities.UserEntity;
 import com.bank_account.exceptions.UserAlreadyExistsException;
 import com.bank_account.exceptions.UserNotFoundException;
 import com.bank_account.mapper.UserMapper;
+import com.bank_account.producer.BankAccountEventProducer;
 import com.bank_account.producer.UserEventProducer;
 import com.bank_account.repository.UserRepository;
 import com.bank_account.validator.UserValidator;
@@ -29,6 +30,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final UserValidator userValidator;
     private final UserEventProducer userEventProducer;
+    private final BankAccountEventProducer bankAccountEventProducer;
 
     public UserCreateResponse createUser(final CreateUserRequest createUserRequest) {
         final UserEntity userEntity = userMapper.toEntity(createUserRequest);
@@ -37,10 +39,14 @@ public class UserService {
         userValidator.validateEmailNotExists(createUserRequest.email());
 
         log.info("Creating user: {}", userEntity);
+        
         var savedUser = userRepository.save(userEntity);
 
         var event = userMapper.toUserCreatedEvent(savedUser);
         userEventProducer.sendUserCreatedEvent(event);
+
+        var idUser = userMapper.toBankAccountCreateEvent(savedUser);
+        bankAccountEventProducer.sendToCreateBankAccount(idUser);
 
         return userMapper.toCreateResponse(savedUser);
     }

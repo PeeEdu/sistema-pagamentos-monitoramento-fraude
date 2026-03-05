@@ -1,15 +1,21 @@
-# ==========================
-# Dockerfile Simplificado
-# ==========================
 FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-# Copia o JAR já construído localmente
+# Instalar curl para healthcheck
+RUN apt-get update && \
+    apt-get install -y curl && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copiar JAR já construído localmente
 COPY build/libs/*.jar app.jar
 
-# Expõe porta padrão do Spring Boot
+# Expor porta
 EXPOSE 8080
 
-# Comando de inicialização
+# Healthcheck (opcional)
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+  CMD curl -f http://localhost:8080/actuator/health || exit 1
+
+# Iniciar aplicação
 ENTRYPOINT ["java", "-jar", "app.jar"]

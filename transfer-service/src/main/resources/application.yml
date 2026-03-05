@@ -1,13 +1,46 @@
 server:
-  port: 8082
+  port: 8080
 
 spring:
+  application:
+    name: user-service
+
+  # MongoDB (NÃO PostgreSQL!)
   data:
     mongodb:
-      uri: mongodb://mongo_transfer:27017/transfer_db
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://admin:admin123@localhost:27017/transfer_db?authSource=admin}
 
-  rabbitmq:
-    host: rabbitmq
-    port: 5672
-    username: admin
-    password: admin
+  # Desabilitar auto-configuração JPA
+
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+
+# Swagger/OpenAPI
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+
+# Tópicos Kafka
+kafka:
+  topics:
+    user-created: ${KAFKA_TOPIC_USER_CREATED:user-created-topic}
+
+# Logging
+logging:
+  level:
+    root: INFO
+    org.springframework.kafka: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.data.mongodb: DEBUG
+    com.bank_account: DEBUG
