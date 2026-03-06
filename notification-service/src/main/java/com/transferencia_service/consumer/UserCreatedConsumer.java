@@ -4,7 +4,6 @@ import com.transferencia_service.event.UserCreatedEvent;
 import com.transferencia_service.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
@@ -18,11 +17,8 @@ public class UserCreatedConsumer {
 
     private final NotificationService notificationService;
 
-    @Value("${kafka.topics.user-created}")
-    private String userCreatedTopic;
-
     @KafkaListener(
-            topics = "${kafka.topics.user-created}",  // ✅ Lê do application.yml
+            topics = "${kafka.topics.user-created}",
             groupId = "${spring.kafka.consumer.group-id}",
             containerFactory = "kafkaListenerContainerFactory"
     )
@@ -41,6 +37,7 @@ public class UserCreatedConsumer {
             log.info("✅ Notificação processada com sucesso para: {}", event.getEmail());
         } catch (Exception e) {
             log.error("❌ Erro ao processar evento: {}", event, e);
+            // TODO: Implementar retry ou dead letter queue
         }
     }
 }

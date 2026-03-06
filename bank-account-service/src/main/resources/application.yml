@@ -1,26 +1,24 @@
 server:
-  port: 8080
+  port: 8080 # ✅ PORTA DIFERENTE!
 
 spring:
   application:
-    name: user-service
+    name: bank-account-service  # ✅ NOME CORRETO
 
-  # MongoDB (NÃO PostgreSQL!)
   data:
     mongodb:
-      uri: ${SPRING_DATA_MONGODB_URI:mongodb://admin:admin123@localhost:27017/bank-account_db?authSource=admin}
-
-  # Desabilitar auto-configuração JPA
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://admin:admin123@localhost:27017/bank_account_db?authSource=admin}
 
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-    kafka:
-      bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
-      consumer:
-        group-id: bank-account-group
-        auto-offset-reset: earliest
-        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-        value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+    consumer:
+      group-id: bank-account-service-group  # ✅ GROUP-ID ÚNICO
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.value.default.type: com.bank_account.event.UserCreatedEvent  # ✅ Ajuste o package
 
 # Swagger/OpenAPI
 springdoc:
@@ -36,6 +34,7 @@ springdoc:
 # Tópicos Kafka
 kafka:
   topics:
+    user-created: ${KAFKA_TOPIC_USER_CREATED:user-created-topic}
     bank-account-created: ${KAFKA_TOPIC_BANK_ACCOUNT_CREATED:bank-account-created-topic}
 
 # Logging

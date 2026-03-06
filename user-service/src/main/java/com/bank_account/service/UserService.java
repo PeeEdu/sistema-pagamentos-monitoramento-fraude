@@ -45,9 +45,6 @@ public class UserService {
         var event = userMapper.toUserCreatedEvent(savedUser);
         userEventProducer.sendUserCreatedEvent(event);
 
-        var idUser = userMapper.toBankAccountCreateEvent(savedUser);
-        bankAccountEventProducer.sendToCreateBankAccount(idUser);
-
         return userMapper.toCreateResponse(savedUser);
     }
 

@@ -1,16 +1,13 @@
 server:
-  port: 8080
+  port: 8080  # ✅ Producer principal
 
 spring:
   application:
     name: user-service
 
-  # MongoDB (NÃO PostgreSQL!)
   data:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI:mongodb://admin:admin123@localhost:27017/user_db?authSource=admin}
-
-  # Desabilitar auto-configuração JPA
 
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}

@@ -4,9 +4,7 @@ import com.bank_account.dto.request.CreateUserRequest;
 import com.bank_account.dto.response.UserCreateResponse;
 import com.bank_account.dto.response.UserResponse;
 import com.bank_account.entities.UserEntity;
-import com.bank_account.event.CreateBankAccountEvent;
 import com.bank_account.event.UserCreatedEvent;
-import com.bank_account.producer.BankAccountEventProducer;
 import org.mapstruct.*;
 
 import java.time.Instant;
@@ -47,9 +45,5 @@ public interface UserMapper {
     @Mapping(target = "createdAt", ignore = true)  // MongoDB cuida disso
     @Mapping(target = "updatedAt", ignore = true)
     UserEntity toEntity(CreateUserRequest createUserRequest);
-
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "userId", source = "userId")
-    CreateBankAccountEvent toBankAccountCreateEvent(UserEntity userEntity);
 
 }
