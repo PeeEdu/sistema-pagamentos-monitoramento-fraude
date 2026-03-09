@@ -8,14 +8,15 @@ import com.bank_account.event.UserCreatedEvent;
 import org.mapstruct.*;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Mapper(
         componentModel = MappingConstants.ComponentModel.SPRING,
         injectionStrategy = InjectionStrategy.CONSTRUCTOR,
-        imports = Instant.class
+        imports = {Instant.class, LocalDateTime.class, ZoneId.class}
 )
 public interface UserMapper {
-
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
@@ -35,15 +36,25 @@ public interface UserMapper {
     @Mapping(target = "updatedAt", source = "updatedAt")
     UserResponse toResponse(UserEntity userEntity);
 
+    // ✅ CORRIGIDO: Agora mapeia CPF e CreatedAt
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "userId", source = "id")
     @Mapping(target = "name", source = "name")
     @Mapping(target = "email", source = "email")
+    @Mapping(target = "cpf", source = "cpf")  // ✅ ADICIONADO
+    @Mapping(target = "createdAt", expression = "java(convertInstantToLocalDateTime(userEntity.getCreatedAt()))")  // ✅ ADICIONADO
     UserCreatedEvent toUserCreatedEvent(UserEntity userEntity);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)  // MongoDB cuida disso
+    @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     UserEntity toEntity(CreateUserRequest createUserRequest);
 
+    // ✅ Método helper para converter Instant -> LocalDateTime
+    default LocalDateTime convertInstantToLocalDateTime(Instant instant) {
+        if (instant == null) {
+            return LocalDateTime.now();
+        }
+        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+    }
 }

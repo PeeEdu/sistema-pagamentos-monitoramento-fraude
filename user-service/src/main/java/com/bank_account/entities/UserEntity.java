@@ -26,7 +26,7 @@ public class UserEntity {
     private String email;
     private String password;
 
-    @Indexed
+    @Indexed(unique = true)
     private String cpf;
     private String phone;
 

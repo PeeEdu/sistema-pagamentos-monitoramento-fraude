@@ -32,7 +32,7 @@ public class BankAccountService {
         log.info("🏦 Criando conta bancária para userId: {}", event.getUserId());
 
          var bankAccountEntity = bankAccountMapper.toEntity(event);
-         bankAccountEntity.setAccountType(generateAccountNumber());
+         bankAccountEntity.setAccountNumber(generateAccountNumber());
 
         BankAccount savedAccount = bankAccountRepository.save(bankAccountEntity);
         log.info("✅ Conta criada: {} para userId: {}",
