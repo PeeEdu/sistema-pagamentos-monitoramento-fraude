@@ -1,15 +1,15 @@
 package com.bank_account.controller;
 
 
+import com.bank_account.dto.request.CreatePixKeyRequest;
 import com.bank_account.dto.response.BankAccountResponse;
 import com.bank_account.dto.response.BaseResponse;
+import com.bank_account.dto.response.CreatePixKeyResponse;
 import com.bank_account.service.BankAccountService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/bank-account")
@@ -27,4 +27,18 @@ public class BankAccountController {
                 .build());
 
     }
+
+    @PatchMapping("/create/pix/{userId}")
+    public ResponseEntity<BaseResponse<CreatePixKeyResponse>> createPixKey(
+            @PathVariable("userId") String userId,
+            @RequestBody @Valid CreatePixKeyRequest createPixKeyRequest
+            ){
+        final var pixkey = bankAccountService.createPixKey(userId, createPixKeyRequest);
+
+        return ResponseEntity.ok(BaseResponse.<CreatePixKeyResponse>builder()
+                .data(pixkey)
+                .message("Pix criado com sucesso")
+                .build());
+    }
+
 }

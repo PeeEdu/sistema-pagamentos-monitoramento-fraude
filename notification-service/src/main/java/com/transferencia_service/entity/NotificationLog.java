@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -21,13 +22,13 @@ public class NotificationLog {
 
     private String userId;
     private String email;
-    private String type; // EMAIL, SMS, PUSH
-    private String status; // SUCCESS, FAILED, PENDING
+    private String type;
+    private String status;
     private String message;
     private String errorMessage;
 
-    @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @CreatedDate
+    private LocalDateTime createdAt;
 
     private LocalDateTime sentAt;
 }

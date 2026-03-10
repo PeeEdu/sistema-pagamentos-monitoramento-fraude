@@ -16,7 +16,6 @@ public class UserCreatedEvent {
     private String userId;
     private String name;
     private String email;
-    private String cpf;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;

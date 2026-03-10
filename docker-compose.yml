@@ -37,7 +37,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
       interval: 10s
       timeout: 3s
       retries: 5
@@ -130,7 +130,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "timeout 10s bash -c ':> /dev/tcp/127.0.0.1/9600' || exit 1"]
+      test: [ "CMD-SHELL", "timeout 10s bash -c ':> /dev/tcp/127.0.0.1/9600' || exit 1" ]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -152,7 +152,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      test: [ "CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1" ]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -273,6 +273,34 @@ services:
       ZEEBE_CLIENT_BROKER_GATEWAY_ADDRESS: zeebe:26500
     ports:
       - "8085:8080"
+    networks:
+      - app-network
+    restart: unless-stopped
+
+    # ==========================
+    # TRANSFER SERVICE
+    # ==========================
+  transfer-service:
+    build: ./transfer-service
+    container_name: transfer-service
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+#    env_file:
+#      - ./transfer-service/.env
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://admin:admin123@mongodb:27017/transfer_db?authSource=admin
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_PASSWORD: redis123
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      ZEEBE_CLIENT_BROKER_GATEWAY_ADDRESS: zeebe:26500
+    ports:
+      - "8086:8080"
     networks:
       - app-network
     restart: unless-stopped

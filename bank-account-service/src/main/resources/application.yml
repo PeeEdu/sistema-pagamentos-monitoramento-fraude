@@ -1,9 +1,9 @@
 server:
-  port: 8080 # ✅ PORTA DIFERENTE!
+  port: 8080
 
 spring:
   application:
-    name: bank-account-service  # ✅ NOME CORRETO
+    name: bank-account-service
 
   data:
     mongodb:
@@ -11,16 +11,21 @@ spring:
 
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
     consumer:
-      group-id: bank-account-service-group  # ✅ GROUP-ID ÚNICO
+      group-id: bank-account-service-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
-        spring.json.value.default.type: com.bank_account.event.UserCreatedEvent  # ✅ Ajuste o package
 
-# Swagger/OpenAPI
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+
 springdoc:
   api-docs:
     path: /v3/api-docs
@@ -31,11 +36,15 @@ springdoc:
     operations-sorter: method
     tags-sorter: alpha
 
-# Tópicos Kafka
 kafka:
   topics:
     user-created: ${KAFKA_TOPIC_USER_CREATED:user-created-topic}
+    transfer-initiated: ${KAFKA_TOPIC_TRANSFER_INITIATED:transfer-initiated-topic}
+
+    # ✅ Produz
     bank-account-created: ${KAFKA_TOPIC_BANK_ACCOUNT_CREATED:bank-account-created-topic}
+    transfer-validated: ${KAFKA_TOPIC_TRANSFER_VALIDATED:transfer-validated-topic}
+    transfer-completed: ${KAFKA_TOPIC_TRANSFER_COMPLETED:transfer-completed-topic}
 
 # Logging
 logging:

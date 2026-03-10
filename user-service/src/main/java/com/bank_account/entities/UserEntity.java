@@ -22,12 +22,14 @@ public class UserEntity {
     private String id;
     private String name;
 
-    @Indexed
+    @Indexed(unique = true)
     private String email;
     private String password;
 
     @Indexed(unique = true)
     private String cpf;
+
+    @Indexed(unique = true)
     private String phone;
 
     @CreatedDate

@@ -1,6 +1,6 @@
 package com.bank_account.consumer;
 
-import com.bank_account.event.UserCreatedEvent;
+import com.bank_account.event.TransferInitiatedEvent;
 import com.bank_account.service.BankAccountService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,35 +16,39 @@ import java.util.LinkedHashMap;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CreateBankAccountConsumer {
+public class TransferInitiatedConsumer {
 
-    private final BankAccountService bankAccountService;
     private final ObjectMapper objectMapper;
+    private final BankAccountService bankAccountService;
 
     @KafkaListener(
-            topics = "${kafka.topics.user-created}",
+            topics = "${kafka.topics.transfer-initiated}",
             groupId = "${spring.kafka.consumer.group-id}",
             containerFactory = "kafkaListenerContainerFactory"
     )
-    public void consumeUserCreatedEvent(
+    public void consumeTransferInitiated(
             @Payload LinkedHashMap<String, Object> payload,
             @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset
     ) {
-        log.info("MENSAGEM RECEBIDA");
+        log.info("========================================");
+        log.info("🏦 [BANK ACCOUNT] Transferência recebida para validar");
         log.info("Partition: {}, Offset: {}", partition, offset);
-        log.info("Payload: {}", payload);
+        log.info("========================================");
 
         try {
-            UserCreatedEvent event = objectMapper.convertValue(payload, UserCreatedEvent.class);
-            log.info("   UserId: {}", event.getUserId());
+            TransferInitiatedEvent event = objectMapper.convertValue(payload, TransferInitiatedEvent.class);
 
-            bankAccountService.createAccountForUser(event);
-            log.info("Conta bancária criada com sucesso!");
+            log.info("Transfer ID: {}", event.getTransferId());
+            log.info("From Account: {}", event.getFromAccountId());
+            log.info("Amount: {}", event.getAmount());
+
+
+            bankAccountService.process(event);
 
         } catch (Exception e) {
-            log.error("Erro ao processar evento", e);
-            throw new RuntimeException("Erro ao processar evento de criação de usuário", e);
+            log.error("❌ Erro ao processar transferência", e);
+            throw new RuntimeException("Erro ao processar transferência", e);
         }
     }
 }

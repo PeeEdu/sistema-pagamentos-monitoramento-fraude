@@ -3,7 +3,9 @@ package com.bank_account.validator;
 import com.bank_account.validator.annotation.ValidCPF;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class CPFValidator implements ConstraintValidator<ValidCPF, String> {
 
     @Override
@@ -27,23 +29,18 @@ public class CPFValidator implements ConstraintValidator<ValidCPF, String> {
             for (int i = 0; i < 9; i++) {
                 sum += Character.getNumericValue(cpf.charAt(i)) * (10 - i);
             }
-            int firstDigit = 11 - (sum % 11);
-            if (firstDigit >= 10) {
-                firstDigit = 0;
-            }
+            int remainder = sum % 11;
+            int firstDigit = (remainder < 2) ? 0 : 11 - remainder;
 
             if (firstDigit != Character.getNumericValue(cpf.charAt(9))) {
                 return false;
             }
-
             sum = 0;
             for (int i = 0; i < 10; i++) {
                 sum += Character.getNumericValue(cpf.charAt(i)) * (11 - i);
             }
-            int secondDigit = 11 - (sum % 11);
-            if (secondDigit >= 10) {
-                secondDigit = 0;
-            }
+            remainder = sum % 11;
+            int secondDigit = (remainder < 2) ? 0 : 11 - remainder;
 
             return secondDigit == Character.getNumericValue(cpf.charAt(10));
 

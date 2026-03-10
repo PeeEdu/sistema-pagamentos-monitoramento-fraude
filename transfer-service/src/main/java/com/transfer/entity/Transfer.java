@@ -1,9 +1,11 @@
-package com.bank_account.entity;
+package com.transfer.entity;
 
+import com.transfer.enums.TransferStatus;
+import com.transfer.enums.TransferType;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -12,38 +14,40 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.List;
 
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "bank_accounts")
-public class BankAccount {
+@Document(collection = "transfers")
+public abstract class Transfer {
 
     @Id
     private String id;
 
     @Indexed
-    private String userId;
+    private String fromAccountId;
 
-    @Indexed(unique = true)
-    private String accountNumber;
+    private BigDecimal amount;
 
-    private BigDecimal balance;
+    @Indexed
+    private TransferStatus status;
 
-    private String accountType;
+    private String description;
 
-    private String status;
-
-    private String currency;
-
-    private List<PixKey> pixKey;
+    private String failureReason;
 
     @CreatedDate
-    @Builder.Default
-    private Instant createdAt = Instant.now();
+    private Instant createdAt;
 
     @LastModifiedDate
     private Instant updatedAt;
+
+    @Indexed
+    private String initiatedBy;
+
+    @Indexed
+    private String geoLocatization;
+
+    public abstract TransferType getType();
 }

@@ -3,17 +3,25 @@ server:
 
 spring:
   application:
-    name: user-service
+    name: transfer-service
 
-  # MongoDB (NÃO PostgreSQL!)
   data:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI:mongodb://admin:admin123@localhost:27017/transfer_db?authSource=admin}
 
-  # Desabilitar auto-configuração JPA
-
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+    # ✅ Consumer (recebe eventos)
+    consumer:
+      group-id: transfer-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+
+    # ✅ Producer (envia eventos)
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -34,8 +42,10 @@ springdoc:
 # Tópicos Kafka
 kafka:
   topics:
-    user-created: ${KAFKA_TOPIC_USER_CREATED:user-created-topic}
+    transfer-initiated: ${KAFKA_TOPIC_TRANSFER_INITIATED:transfer-initiated-topic}
 
+
+    transfer-completed: ${KAFKA_TOPIC_TRANSFER_COMPLETED:transfer-completed-topic}
 # Logging
 logging:
   level:
@@ -43,4 +53,4 @@ logging:
     org.springframework.kafka: DEBUG
     org.springframework.web: DEBUG
     org.springframework.data.mongodb: DEBUG
-    com.bank_account: DEBUG
+    com.transfer: DEBUG

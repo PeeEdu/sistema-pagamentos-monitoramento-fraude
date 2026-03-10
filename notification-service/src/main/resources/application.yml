@@ -10,21 +10,21 @@ spring:
       uri: ${SPRING_DATA_MONGODB_URI:mongodb://admin:admin123@localhost:27017/notification_db?authSource=admin}
 
   kafka:
-    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}  # ✅ ADICIONADO
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
-      group-id: notification-service-group  # ✅ GROUP-ID ÚNICO
+      group-id: notification-service-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
-        spring.json.value.default.type: com.bank_account.event.UserCreatedEvent  # ✅ Ajuste o package
+        spring.json.value.default.type: com.bank_account.event.UserCreatedEvent
 
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${MAIL_USERNAME:estudosti877@gmail.com}  # ✅ Variável de ambiente
-    password: ${MAIL_PASSWORD}  # ✅ NUNCA hardcode senha!
+    username: ${MAIL_USERNAME:estudosti877@gmail.com}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -36,13 +36,11 @@ spring:
           timeout: 5000
           writetimeout: 5000
 
-# Tópicos Kafka
 kafka:
   topics:
     user-created: ${KAFKA_TOPIC_USER_CREATED:user-created-topic}
     transaction-notification: ${KAFKA_TOPIC_TRANSACTION_NOTIFICATION:transaction-notification-topic}
 
-# Logging
 logging:
   level:
     root: INFO
