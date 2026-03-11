@@ -1,6 +1,6 @@
 package com.bank_account.dto.response;
 
-import com.bank_account.PixKeyType;
+import com.bank_account.enums.PixKeyType;
 import lombok.Builder;
 
 @Builder

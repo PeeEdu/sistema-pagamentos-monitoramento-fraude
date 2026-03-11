@@ -1,6 +1,6 @@
 package com.bank_account.dto.request;
 
-import com.bank_account.PixKeyType;
+import com.bank_account.enums.PixKeyType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;

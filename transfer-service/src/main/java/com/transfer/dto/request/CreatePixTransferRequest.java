@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @Builder
 public record CreatePixTransferRequest(
         @NotBlank(message = "Conta de origem é obrigatória")
-        String fromAccountId,
+        String fromAccountNumber,
 
         @NotNull(message = "Chave PIX é obrigatória")
         PixKeyRequestDto pix,
@@ -22,6 +22,9 @@ public record CreatePixTransferRequest(
         String description,
 
         @NotBlank(message = "ID do usuário é obrigatório")
-        String initiatedBy
+        String initiatedBy,
+
+        @NotBlank(message = "A geolocalização é obrigatória")
+        String geoLocalization
 ) {
 }

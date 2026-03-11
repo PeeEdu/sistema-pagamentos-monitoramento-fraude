@@ -1,4 +1,4 @@
-package com.bank_account;
+package com.bank_account.enums;
 
 public enum PixKeyType {
     CPF,

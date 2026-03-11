@@ -10,7 +10,7 @@ import java.time.Instant;
 @Builder
 public record TransferResponse(
         String id,
-        String fromAccountId,
+        String fromAccountNumber,
         String toAccountId,
         BigDecimal amount,
         TransferStatus status,

@@ -12,7 +12,6 @@ import java.util.Optional;
 public interface BankAccountRepository extends MongoRepository<BankAccount, String> {
     BankAccount findByUserId(String userId);
     BankAccount findByAccountNumber(String accountNumber);
-    boolean existsByUserId(String userId);
 
     @Query("{ 'pixKey.key': ?0 }")
     Optional<BankAccount> findByPixKeyKey(String pixKey);

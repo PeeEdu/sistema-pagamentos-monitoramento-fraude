@@ -1,6 +1,6 @@
 package com.bank_account.event;
 
-import com.bank_account.PixKeyType;
+import com.bank_account.enums.PixKeyType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class TransferInitiatedEvent {
     private String transferId;
-    private String fromAccountId;
+    private String fromAccountNumber;
     private PixKeyType pixKeyType;
     private String pixKey;
     private BigDecimal amount;

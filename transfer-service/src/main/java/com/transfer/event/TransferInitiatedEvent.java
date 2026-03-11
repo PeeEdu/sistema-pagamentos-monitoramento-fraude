@@ -20,13 +20,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class TransferInitiatedEvent {
     private String transferId;
-    private String fromAccountId;
+    private String fromAccountNumber;
     private PixKeyType pixKeyType;
     private String pixKey;
     private BigDecimal amount;
     private String description;
     private String initiatedBy;
-    private String geoLocatization;
+    private String geoLocalization;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)

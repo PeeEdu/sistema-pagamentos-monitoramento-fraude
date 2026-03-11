@@ -26,7 +26,7 @@ public abstract class Transfer {
     private String id;
 
     @Indexed
-    private String fromAccountId;
+    private String fromAccountNumber;
 
     private BigDecimal amount;
 
@@ -47,7 +47,7 @@ public abstract class Transfer {
     private String initiatedBy;
 
     @Indexed
-    private String geoLocatization;
+    private String geoLocalization;
 
     public abstract TransferType getType();
 }

@@ -20,13 +20,14 @@ import java.time.LocalDateTime;
 public class TransferCompletedEvent {
 
     private String transferId;
-    private String fromAccountId;
+    private String fromAccountNumber;
     private String toAccountId;
     private BigDecimal amount;
     private String status;
     private String description;
     private String failureReason;
     private String initiatedBy;
+    private String geoLocalization;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)

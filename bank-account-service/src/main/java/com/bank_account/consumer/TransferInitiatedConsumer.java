@@ -40,7 +40,7 @@ public class TransferInitiatedConsumer {
             TransferInitiatedEvent event = objectMapper.convertValue(payload, TransferInitiatedEvent.class);
 
             log.info("Transfer ID: {}", event.getTransferId());
-            log.info("From Account: {}", event.getFromAccountId());
+            log.info("From Account: {}", event.getFromAccountNumber());
             log.info("Amount: {}", event.getAmount());
 
 

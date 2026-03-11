@@ -1,6 +1,6 @@
 package com.bank_account.entity;
 
-import com.bank_account.PixKeyType;
+import com.bank_account.enums.PixKeyType;
 import lombok.*;
 
 @Getter

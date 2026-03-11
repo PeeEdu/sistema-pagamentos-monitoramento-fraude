@@ -46,4 +46,23 @@ public class BankAccount {
 
     @LastModifiedDate
     private Instant updatedAt;
+
+    public void deposit(BigDecimal amount) {
+        if (amount == null || amount.signum() <= 0) {
+            throw new IllegalArgumentException("Deposit amount must be greater than zero");
+        }
+        this.balance = this.balance.add(amount);
+    }
+
+    public void withdraw(BigDecimal amount) {
+        if (amount == null || amount.signum() <= 0) {
+            throw new IllegalArgumentException("Withdraw amount must be greater than zero");
+        }
+
+        if (this.balance.compareTo(amount) < 0) {
+            throw new IllegalStateException("Insufficient balance");
+        }
+
+        this.balance = this.balance.subtract(amount);
+    }
 }

@@ -10,7 +10,7 @@ import java.time.Instant;
 @Builder
 public record PixResponse(
         String id,
-        String fromAccountId,
+        String fromAccountNumber,
         String pixKey,
         PixKeyType pixKeyType,
         BigDecimal amount,
@@ -19,6 +19,7 @@ public record PixResponse(
         String failureReason,
         Instant createdAt,
         Instant updatedAt,
-        String initiatedBy
+        String initiatedBy,
+        String geoLocalization
 ) {
 }

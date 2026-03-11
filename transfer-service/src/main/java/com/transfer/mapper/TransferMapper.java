@@ -12,7 +12,7 @@ import org.mapstruct.Mapping;
 public interface TransferMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "fromAccountId", source = "fromAccountId")
+    @Mapping(target = "fromAccountNumber", source = "fromAccountNumber")
     @Mapping(target = "pixKey", source = "pix.key")
     @Mapping(target = "pixKeyType", source = "pix.type")
     @Mapping(target = "amount", source = "amount")
@@ -22,21 +22,22 @@ public interface TransferMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "initiatedBy", source = "initiatedBy")
-    @Mapping(target = "geoLocatization", ignore = true)
+    @Mapping(target = "geoLocalization", source = "geoLocalization")
     PixTransfer toEntity(CreatePixTransferRequest request);
 
     @Mapping(target = "pixKey", source = "pixKey")
     @Mapping(target = "pixKeyType", source = "pixKeyType")
+    @Mapping(target = "geoLocalization", source = "geoLocalization")
     PixResponse toResponse(PixTransfer transferEntity);
 
     @Mapping(target = "transferId", source = "id")
-    @Mapping(target = "fromAccountId", source = "fromAccountId")
+    @Mapping(target = "fromAccountNumber", source = "fromAccountNumber")
     @Mapping(target = "pixKey", source = "pixKey")
     @Mapping(target = "pixKeyType", source = "pixKeyType")
     @Mapping(target = "amount", source = "amount")
     @Mapping(target = "description", source = "description")
     @Mapping(target = "initiatedBy", source = "initiatedBy")
-    @Mapping(target = "geoLocatization", source = "geoLocatization")
+    @Mapping(target = "geoLocalization", source = "geoLocalization")
     @Mapping(target = "initiatedAt", expression = "java(java.time.LocalDateTime.now())")
     TransferInitiatedEvent toEvent(PixTransfer transfer);
 }

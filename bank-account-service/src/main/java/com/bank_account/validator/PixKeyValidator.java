@@ -13,7 +13,7 @@ public class PixKeyValidator {
 
     public void validateBankAccountExists(BankAccount bankAccount, String userId) {
         if (bankAccount == null) {
-            log.error("❌ Conta bancária não encontrada para o usuário: {}", userId);
+            log.error("Conta bancária não encontrada para o usuário: {}", userId);
             throw new RuntimeException("Conta bancária não encontrada");
         }
     }
@@ -24,7 +24,7 @@ public class PixKeyValidator {
                     .anyMatch(pk -> pk.getKey().equals(request.key()));
 
             if (exists) {
-                log.error("❌ Chave PIX já cadastrada: {} - {}", request.type(), request.key());
+                log.error("Chave PIX já cadastrada: {} - {}", request.type(), request.key());
                 throw new RuntimeException("Chave PIX já cadastrada");
             }
         }
