@@ -24,7 +24,7 @@ services:
       retries: 5
 
   # ==========================
-  # Redis - Cache e Sessões
+  # Redis - Cache
   # ==========================
   redis:
     image: redis:7-alpine
@@ -37,13 +37,13 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      test: ["CMD", "redis-cli", "-a", "redis123", "ping"]
       interval: 10s
       timeout: 3s
       retries: 5
 
   # ==========================
-  # Zookeeper - Dependência do Kafka
+  # Zookeeper
   # ==========================
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
@@ -65,7 +65,7 @@ services:
       retries: 5
 
   # ==========================
-  # Kafka - Mensageria
+  # Kafka
   # ==========================
   kafka:
     image: confluentinc/cp-kafka:7.5.0
@@ -75,7 +75,6 @@ services:
         condition: service_healthy
     ports:
       - "9092:9092"
-      - "9093:9093"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -96,7 +95,7 @@ services:
       retries: 5
 
   # ==========================
-  # Kafka UI - Interface Gráfica
+  # Kafka UI
   # ==========================
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -113,91 +112,6 @@ services:
       - app-network
 
   # ==========================
-  # Camunda Platform 8 (Zeebe)
-  # ==========================
-  zeebe:
-    image: camunda/zeebe:8.4.0
-    container_name: zeebe
-    ports:
-      - "26500:26500"
-      - "9600:9600"
-    environment:
-      - ZEEBE_LOG_LEVEL=info
-      - ZEEBE_BROKER_EXPORTERS_ELASTICSEARCH_CLASSNAME=io.camunda.zeebe.exporter.ElasticsearchExporter
-      - ZEEBE_BROKER_EXPORTERS_ELASTICSEARCH_ARGS_URL=http://elasticsearch:9200
-    volumes:
-      - zeebe_data:/usr/local/zeebe/data
-    networks:
-      - app-network
-    healthcheck:
-      test: [ "CMD-SHELL", "timeout 10s bash -c ':> /dev/tcp/127.0.0.1/9600' || exit 1" ]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-
-  # ==========================
-  # Elasticsearch - Para Camunda Operate/Tasklist
-  # ==========================
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.9.0
-    container_name: elasticsearch
-    ports:
-      - "9200:9200"
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    volumes:
-      - elasticsearch_data:/usr/share/elasticsearch/data
-    networks:
-      - app-network
-    healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1" ]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-
-  # ==========================
-  # Camunda Operate - Interface de Monitoramento
-  # ==========================
-  operate:
-    image: camunda/operate:8.4.0
-    container_name: camunda-operate
-    depends_on:
-      zeebe:
-        condition: service_healthy
-      elasticsearch:
-        condition: service_healthy
-    ports:
-      - "8081:8080"
-    environment:
-      - CAMUNDA_OPERATE_ZEEBE_GATEWAYADDRESS=zeebe:26500
-      - CAMUNDA_OPERATE_ELASTICSEARCH_URL=http://elasticsearch:9200
-      - CAMUNDA_OPERATE_ZEEBEELASTICSEARCH_URL=http://elasticsearch:9200
-    networks:
-      - app-network
-
-  # ==========================
-  # Camunda Tasklist - Gerenciamento de Tarefas
-  # ==========================
-  tasklist:
-    image: camunda/tasklist:8.4.0
-    container_name: camunda-tasklist
-    depends_on:
-      zeebe:
-        condition: service_healthy
-      elasticsearch:
-        condition: service_healthy
-    ports:
-      - "8082:8080"
-    environment:
-      - CAMUNDA_TASKLIST_ZEEBE_GATEWAYADDRESS=zeebe:26500
-      - CAMUNDA_TASKLIST_ELASTICSEARCH_URL=http://elasticsearch:9200
-      - CAMUNDA_TASKLIST_ZEEBEELASTICSEARCH_URL=http://elasticsearch:9200
-    networks:
-      - app-network
-
-  # ==========================
   # USER SERVICE
   # ==========================
   user-service:
@@ -208,15 +122,9 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
-      redis:
-        condition: service_healthy
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://admin:admin123@mongodb:27017/user_db?authSource=admin
-      SPRING_DATA_REDIS_HOST: redis
-      SPRING_DATA_REDIS_PORT: 6379
-      SPRING_DATA_REDIS_PASSWORD: redis123
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      ZEEBE_CLIENT_BROKER_GATEWAY_ADDRESS: zeebe:26500
     ports:
       - "8080:8080"
     networks:
@@ -224,7 +132,7 @@ services:
     restart: unless-stopped
 
   # ==========================
-  # BANK ACCOUNT SERVICE ✅ NOVO
+  # BANK ACCOUNT SERVICE
   # ==========================
   bank-account-service:
     build: ./bank-account-service
@@ -234,17 +142,11 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
-      redis:
-        condition: service_healthy
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://admin:admin123@mongodb:27017/bank_account_db?authSource=admin
-      SPRING_DATA_REDIS_HOST: redis
-      SPRING_DATA_REDIS_PORT: 6379
-      SPRING_DATA_REDIS_PASSWORD: redis123
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      ZEEBE_CLIENT_BROKER_GATEWAY_ADDRESS: zeebe:26500
     ports:
-      - "8083:8080"  # ✅ Porta externa diferente
+      - "8083:8080"
     networks:
       - app-network
     restart: unless-stopped
@@ -260,26 +162,20 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
-      redis:
-        condition: service_healthy
     env_file:
       - ./notification-service/.env
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://admin:admin123@mongodb:27017/notifications_db?authSource=admin
-      SPRING_DATA_REDIS_HOST: redis
-      SPRING_DATA_REDIS_PORT: 6379
-      SPRING_DATA_REDIS_PASSWORD: redis123
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      ZEEBE_CLIENT_BROKER_GATEWAY_ADDRESS: zeebe:26500
     ports:
       - "8085:8080"
     networks:
       - app-network
     restart: unless-stopped
 
-    # ==========================
-    # TRANSFER SERVICE
-    # ==========================
+  # ==========================
+  # TRANSFER SERVICE
+  # ==========================
   transfer-service:
     build: ./transfer-service
     container_name: transfer-service
@@ -288,38 +184,47 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
-      redis:
-        condition: service_healthy
-#    env_file:
-#      - ./transfer-service/.env
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://admin:admin123@mongodb:27017/transfer_db?authSource=admin
-      SPRING_DATA_REDIS_HOST: redis
-      SPRING_DATA_REDIS_PORT: 6379
-      SPRING_DATA_REDIS_PASSWORD: redis123
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      ZEEBE_CLIENT_BROKER_GATEWAY_ADDRESS: zeebe:26500
     ports:
       - "8086:8080"
     networks:
       - app-network
     restart: unless-stopped
 
-# ==========================
-# Volumes Persistentes
-# ==========================
+  # ==========================
+  # FRAUD SERVICE
+  # ==========================
+  fraud-service:
+    build: ./fraud-service
+    container_name: fraud-service
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://admin:admin123@mongodb:27017/fraud_db?authSource=admin
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_PASSWORD: redis123
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    ports:
+      - "8087:8087"
+    networks:
+      - app-network
+    restart: unless-stopped
+
 volumes:
   mongodb_data:
   redis_data:
   zookeeper_data:
   zookeeper_logs:
   kafka_data:
-  zeebe_data:
-  elasticsearch_data:
 
-# ==========================
-# Rede Compartilhada
-# ==========================
 networks:
   app-network:
     driver: bridge

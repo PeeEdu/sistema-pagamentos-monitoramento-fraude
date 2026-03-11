@@ -1,10 +1,10 @@
-package com.transfer;
+package com.fraud;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class TransferEntityApplicationTest {
+public class FraudServiceApplicationTest {
 
     @Test
     void contextLoads() {

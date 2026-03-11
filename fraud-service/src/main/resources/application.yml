@@ -1,0 +1,38 @@
+server:
+  port: 8087
+
+spring:
+  application:
+    name: fraud-service
+
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://admin:admin123@localhost:27017/fraud_db?authSource=admin}
+
+    # ✅ Redis
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+      password: ${SPRING_DATA_REDIS_PASSWORD:redis123}
+      timeout: 60000
+
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: fraud-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+
+kafka:
+  topics:
+    transfer-initiated: ${KAFKA_TOPIC_TRANSFER_INITIATED:transfer-initiated-topic}
+
+logging:
+  level:
+    root: INFO
+    org.springframework.kafka: DEBUG
+    org.springframework.data.redis: DEBUG
+    com.fraud: DEBUG
