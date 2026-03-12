@@ -36,13 +36,11 @@ public interface UserMapper {
     @Mapping(target = "updatedAt", source = "updatedAt")
     UserResponse toResponse(UserEntity userEntity);
 
-    // ✅ CORRIGIDO: Agora mapeia CPF e CreatedAt
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "userId", source = "id")
     @Mapping(target = "name", source = "name")
     @Mapping(target = "email", source = "email")
-    @Mapping(target = "cpf", source = "cpf")  // ✅ ADICIONADO
-    @Mapping(target = "createdAt", expression = "java(convertInstantToLocalDateTime(userEntity.getCreatedAt()))")  // ✅ ADICIONADO
+    @Mapping(target = "createdAt", expression = "java(convertInstantToLocalDateTime(userEntity.getCreatedAt()))")
     UserCreatedEvent toUserCreatedEvent(UserEntity userEntity);
 
     @Mapping(target = "id", ignore = true)
@@ -50,7 +48,6 @@ public interface UserMapper {
     @Mapping(target = "updatedAt", ignore = true)
     UserEntity toEntity(CreateUserRequest createUserRequest);
 
-    // ✅ Método helper para converter Instant -> LocalDateTime
     default LocalDateTime convertInstantToLocalDateTime(Instant instant) {
         if (instant == null) {
             return LocalDateTime.now();

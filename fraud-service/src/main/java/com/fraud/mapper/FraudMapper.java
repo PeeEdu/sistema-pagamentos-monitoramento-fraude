@@ -36,7 +36,6 @@ public interface FraudMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "transactionId", source = "event.transferId")
-    @Mapping(target = "userId", source = "event.initiatedBy")
     @Mapping(target = "amount", source = "event.amount")
     @Mapping(target = "fraudTypes", source = "fraudTypes")
     @Mapping(target = "status", constant = "DETECTED")

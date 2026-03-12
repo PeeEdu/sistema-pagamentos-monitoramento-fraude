@@ -4,6 +4,7 @@ import com.fraud.entity.FraudAnalysisResult;
 import com.fraud.entity.FraudEntity;
 import com.fraud.enums.FraudStatus;
 import com.fraud.enums.FraudType;
+import com.fraud.enums.RiskLevel;
 import com.fraud.event.TransferInitiatedEvent;
 import com.fraud.event.TransferValidatedEvent;
 import com.fraud.mapper.FraudMapper;
@@ -31,14 +32,13 @@ public class FraudDetectionService {
     private final TransferValidatedProducer transferValidatedProducer;
     private final FraudMapper fraudMapper;
 
-    private static final double FRAUD_THRESHOLD = 50.0;
-
     public void analyze(TransferInitiatedEvent event) {
         log.info("🔍 Analisando transferência: {}", event.getTransferId());
 
         List<FraudType> allFraudTypes = new ArrayList<>();
         double totalRiskScore = 0.0;
 
+        // ✅ Acumula scores de todos os validators
         for (FraudValidator validator : validators) {
             FraudAnalysisResult result = validator.validate(event);
 
@@ -48,16 +48,27 @@ public class FraudDetectionService {
             }
         }
 
-        boolean approved = totalRiskScore < FRAUD_THRESHOLD;
+        // ✅ Calcula o risk level final baseado no score total
+        RiskLevel finalRiskLevel = RiskLevel.fromScore(totalRiskScore);
+
+        // ✅ Decisão baseada no RiskLevel
+        boolean approved = shouldApprove(finalRiskLevel, totalRiskScore);
 
         saveTransactionToRedis(event);
 
+        // ✅ Salva no banco apenas se rejeitado
         if (!approved) {
-            fraudRepository.save(fraudMapper.toFraudEntity(event, totalRiskScore, allFraudTypes));
+            FraudEntity fraudEntity = fraudMapper.toFraudEntity(event, totalRiskScore, allFraudTypes);
+            fraudEntity.setRiskLevel(finalRiskLevel);
+            fraudEntity.setStatus(FraudStatus.BLOCKED);
+            fraudRepository.save(fraudEntity);
         }
 
-        log.info("📊 Análise - Aprovado: {} - Score: {} - Tipos: {}",
-                approved, totalRiskScore, allFraudTypes);
+        log.info("📊 Análise completa:");
+        log.info("   Aprovado: {}", approved);
+        log.info("   Score: {}", totalRiskScore);
+        log.info("   Risk Level: {}", finalRiskLevel);
+        log.info("   Tipos: {}", allFraudTypes);
 
         TransferValidatedEvent validatedEvent = fraudMapper.toValidatedEvent(
                 event,
@@ -67,6 +78,20 @@ public class FraudDetectionService {
         );
 
         transferValidatedProducer.send(validatedEvent);
+    }
+
+    private boolean shouldApprove(RiskLevel riskLevel, double score) {
+        return switch (riskLevel) {
+            case LOW -> true;
+
+            case MEDIUM -> score < 50.0;
+
+            case HIGH -> false;
+
+            case CRITICAL -> false;
+
+            default -> false;
+        };
     }
 
     private void saveTransactionToRedis(TransferInitiatedEvent event) {

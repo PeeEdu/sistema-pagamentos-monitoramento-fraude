@@ -20,7 +20,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransferValidatedEvent {
-
     private String transferId;
     private String fromAccountNumber;
     private String pixKey;

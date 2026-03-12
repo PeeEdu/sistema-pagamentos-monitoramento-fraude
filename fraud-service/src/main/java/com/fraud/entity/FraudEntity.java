@@ -28,9 +28,6 @@ public class FraudEntity {
     @Indexed
     private String transactionId;
 
-    @Indexed
-    private String userId;
-
     private BigDecimal amount;
 
     @Indexed

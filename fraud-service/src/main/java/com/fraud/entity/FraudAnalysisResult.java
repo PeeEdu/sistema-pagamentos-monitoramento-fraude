@@ -1,6 +1,7 @@
 package com.fraud.entity;
 
 import com.fraud.enums.FraudType;
+import com.fraud.enums.RiskLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
