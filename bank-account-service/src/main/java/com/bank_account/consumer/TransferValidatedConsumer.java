@@ -43,10 +43,10 @@ public class TransferValidatedConsumer {
             log.info("Aprovado: {}", event.isApproved());
             log.info("Risk Score: {}", event.getRiskScore());
 
+            // ✅ Decisão simplificada
             if (event.isApproved()) {
                 transferProcessingService.process(event);
             } else {
-                log.error("🚨 Transferência bloqueada: {}", event.getRejectionReason());
                 transferProcessingService.reject(event);
             }
 

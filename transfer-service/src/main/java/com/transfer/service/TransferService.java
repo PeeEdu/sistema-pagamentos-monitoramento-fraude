@@ -3,7 +3,9 @@ package com.transfer.service;
 import com.transfer.dto.request.CreatePixTransferRequest;
 import com.transfer.dto.response.PixResponse;
 import com.transfer.entity.PixTransfer;
+import com.transfer.entity.Transfer;
 import com.transfer.enums.TransferStatus;
+import com.transfer.event.TransferCompletedEvent;
 import com.transfer.event.TransferInitiatedEvent;
 import com.transfer.mapper.TransferMapper;
 import com.transfer.producer.TransferEventProducer;
@@ -36,5 +38,14 @@ public class TransferService {
 
         transferEventProducer.sendInitiatedTransfer(event);
         return transferMapper.toResponse(savedTransfer);
+    }
+
+    public void updateStatus(TransferCompletedEvent event) throws Exception {
+        Transfer pixTransfer = transferRepository.findById(event.getTransferId())
+                .orElseThrow(() -> new Exception("Pix não encontrado"));
+
+        pixTransfer.setStatus(TransferStatus.valueOf(event.getStatus()));
+
+        transferRepository.save(pixTransfer);
     }
 }
