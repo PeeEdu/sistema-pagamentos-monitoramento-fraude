@@ -33,7 +33,7 @@ public class HighFrequencyValidator implements FraudValidator {
             redisTemplate.expire(key, 1, TimeUnit.MINUTES);
         }
 
-        if (count != null && count > MAX_TRANSACTIONS_PER_MINUTE) {
+        if (count > MAX_TRANSACTIONS_PER_MINUTE) {
             log.warn("⚠️ Alta frequência detectada: {} transações em 1 minuto", count);
             fraudTypes.add(FraudType.HIGH_FREQUENCY);
             riskScore = 30.0;

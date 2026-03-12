@@ -12,7 +12,6 @@ spring:
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 
-    # ✅ Consumer (recebe eventos)
     consumer:
       group-id: transfer-service-group
       auto-offset-reset: earliest
@@ -21,14 +20,12 @@ spring:
       properties:
         spring.json.trusted.packages: "*"
 
-    # ✅ Producer (envia eventos)
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         spring.json.add.type.headers: false
 
-# Swagger/OpenAPI
 springdoc:
   api-docs:
     path: /v3/api-docs
@@ -36,21 +33,17 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     enabled: true
-    operations-sorter: method
-    tags-sorter: alpha
 
-# Tópicos Kafka
 kafka:
   topics:
+    #Produz
     transfer-initiated: ${KAFKA_TOPIC_TRANSFER_INITIATED:transfer-initiated-topic}
 
-
+    #Consome
     transfer-completed: ${KAFKA_TOPIC_TRANSFER_COMPLETED:transfer-completed-topic}
-# Logging
+
 logging:
   level:
     root: INFO
     org.springframework.kafka: DEBUG
-    org.springframework.web: DEBUG
-    org.springframework.data.mongodb: DEBUG
     com.transfer: DEBUG

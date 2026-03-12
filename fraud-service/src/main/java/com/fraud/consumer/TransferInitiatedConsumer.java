@@ -1,8 +1,8 @@
-package com.bank_account.consumer;
+package com.fraud.consumer;
 
-import com.bank_account.event.TransferInitiatedEvent;
-import com.bank_account.service.BankAccountService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fraud.event.TransferInitiatedEvent;
+import com.fraud.service.FraudDetectionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -18,37 +18,43 @@ import java.util.LinkedHashMap;
 @RequiredArgsConstructor
 public class TransferInitiatedConsumer {
 
+    private final FraudDetectionService fraudDetectionService;
     private final ObjectMapper objectMapper;
-    private final BankAccountService bankAccountService;
 
     @KafkaListener(
             topics = "${kafka.topics.transfer-initiated}",
             groupId = "${spring.kafka.consumer.group-id}",
             containerFactory = "kafkaListenerContainerFactory"
     )
-    public void consumeTransferInitiated(
+    public void consume(
             @Payload LinkedHashMap<String, Object> payload,
             @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
-            @Header(KafkaHeaders.OFFSET) long offset
+            @Header(KafkaHeaders.OFFSET) long offset,
+            @Header(KafkaHeaders.RECEIVED_TOPIC) String topic
     ) {
-        log.info("========================================");
-        log.info("🏦 [BANK ACCOUNT] Transferência recebida para validar");
-        log.info("Partition: {}, Offset: {}", partition, offset);
-        log.info("========================================");
 
+        log.info("🚨 [FRAUD] Transferência recebida para análise");
+        log.info("Tópico: {}", topic);
+        log.info("Partition: {}", partition);
+        log.info("Offset: {}", offset);
+        log.info("Payload: {}", payload);
+        log.info("");
         try {
+            //Converte payload para TransferInitiatedEvent
             TransferInitiatedEvent event = objectMapper.convertValue(payload, TransferInitiatedEvent.class);
 
-            log.info("Transfer ID: {}", event.getTransferId());
-            log.info("From Account: {}", event.getFromAccountNumber());
-            log.info("Amount: {}", event.getAmount());
+            log.info("📋 Evento convertido:");
+            log.info("   Transfer ID: {}", event.getTransferId());
+            log.info("   From Account: {}", event.getFromAccountNumber());
+            log.info("   Pix Key: {}", event.getPixKey());
+            log.info("   Amount: {}", event.getAmount());
+            log.info("   Initiated By: {}", event.getInitiatedBy());
 
-
-            bankAccountService.process(event);
+            fraudDetectionService.analyze(event);
 
         } catch (Exception e) {
             log.error("❌ Erro ao processar transferência", e);
-            throw new RuntimeException("Erro ao processar transferência", e);
+            throw new RuntimeException("Erro ao processar análise de fraude", e);
         }
     }
 }

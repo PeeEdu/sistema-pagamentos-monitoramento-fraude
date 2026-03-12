@@ -35,8 +35,6 @@ public class TransferService {
         TransferInitiatedEvent event = transferMapper.toEvent(savedTransfer);
 
         transferEventProducer.sendInitiatedTransfer(event);
-
-
         return transferMapper.toResponse(savedTransfer);
     }
 }

@@ -33,24 +33,19 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     enabled: true
-    operations-sorter: method
-    tags-sorter: alpha
 
 kafka:
   topics:
+    # Consome
     user-created: ${KAFKA_TOPIC_USER_CREATED:user-created-topic}
-    transfer-initiated: ${KAFKA_TOPIC_TRANSFER_INITIATED:transfer-initiated-topic}
-
-    # ✅ Produz
-    bank-account-created: ${KAFKA_TOPIC_BANK_ACCOUNT_CREATED:bank-account-created-topic}
     transfer-validated: ${KAFKA_TOPIC_TRANSFER_VALIDATED:transfer-validated-topic}
+
+    #Produz
+    bank-account-created: ${KAFKA_TOPIC_BANK_ACCOUNT_CREATED:bank-account-created-topic}
     transfer-completed: ${KAFKA_TOPIC_TRANSFER_COMPLETED:transfer-completed-topic}
 
-# Logging
 logging:
   level:
     root: INFO
     org.springframework.kafka: DEBUG
-    org.springframework.web: DEBUG
-    org.springframework.data.mongodb: DEBUG
     com.bank_account: DEBUG

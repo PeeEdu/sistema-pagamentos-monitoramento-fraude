@@ -34,7 +34,7 @@ public class FraudEntity {
     private BigDecimal amount;
 
     @Indexed
-    private FraudType fraudType;
+    private List<FraudType> fraudTypes;
 
     @Indexed
     private FraudStatus status;

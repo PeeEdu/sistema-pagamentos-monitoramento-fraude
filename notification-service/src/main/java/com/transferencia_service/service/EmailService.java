@@ -19,11 +19,15 @@ public class EmailService {
             message.setTo(to);
             message.setSubject("Bem-vindo ao Banco!");
             message.setText(String.format(
-                    "Olá %s,\n\n" +
-                            "Seja bem-vindo ao nosso sistema bancário!\n\n" +
-                            "Sua conta foi criada com sucesso.\n\n" +
-                            "Atenciosamente,\n" +
-                            "Equipe Bank Account",
+                    """
+                            Olá %s,
+                            
+                            Seja bem-vindo ao nosso sistema bancário!
+                            
+                            Sua conta foi criada com sucesso.
+                            
+                            Atenciosamente,
+                            Equipe Bank Account""",
                     name
             ));
 

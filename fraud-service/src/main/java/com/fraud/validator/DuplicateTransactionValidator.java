@@ -29,13 +29,12 @@ public class DuplicateTransactionValidator implements FraudValidator {
 
         Boolean exists = redisTemplate.hasKey(key);
 
-        if (Boolean.TRUE.equals(exists)) {
+        if (exists) {
             log.warn("⚠️ Duplicação detectada: {}", event.getTransferId());
             fraudTypes.add(FraudType.DUPLICATE_TRANSACTION);
             riskScore = 40.0;
         } else {
-            // Marca como processada por 5 minutos
-            redisTemplate.opsForValue().set(key, "1", 5, TimeUnit.MINUTES);
+            redisTemplate.opsForValue().set(key, "1", 1, TimeUnit.MINUTES);
         }
 
         return FraudAnalysisResult.builder()
