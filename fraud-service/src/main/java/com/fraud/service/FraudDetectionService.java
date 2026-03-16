@@ -38,7 +38,6 @@ public class FraudDetectionService {
         List<FraudType> allFraudTypes = new ArrayList<>();
         double totalRiskScore = 0.0;
 
-        // ✅ Acumula scores de todos os validators
         for (FraudValidator validator : validators) {
             FraudAnalysisResult result = validator.validate(event);
 
@@ -48,15 +47,12 @@ public class FraudDetectionService {
             }
         }
 
-        // ✅ Calcula o risk level final baseado no score total
         RiskLevel finalRiskLevel = RiskLevel.fromScore(totalRiskScore);
-
-        // ✅ Decisão baseada no RiskLevel
+        
         boolean approved = shouldApprove(finalRiskLevel, totalRiskScore);
 
         saveTransactionToRedis(event);
 
-        // ✅ Salva no banco apenas se rejeitado
         if (!approved) {
             FraudEntity fraudEntity = fraudMapper.toFraudEntity(event, totalRiskScore, allFraudTypes);
             fraudEntity.setRiskLevel(finalRiskLevel);

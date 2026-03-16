@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -20,10 +19,12 @@ public class UserEntity {
 
     @Id
     private String id;
+
     private String name;
 
     @Indexed(unique = true)
     private String email;
+
     private String password;
 
     @Indexed(unique = true)
@@ -31,6 +32,9 @@ public class UserEntity {
 
     @Indexed(unique = true)
     private String phone;
+
+    @Builder.Default
+    private boolean active = true;
 
     @CreatedDate
     @Builder.Default

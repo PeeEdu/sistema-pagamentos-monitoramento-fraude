@@ -1,0 +1,15 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: http://localhost:8081
+        - id: bank-account-service
+          uri: http://localhost:8082
+        - id: transfer-service
+          uri: http://localhost:8083
+
+logging:
+  level:
+    com.gateway: TRACE
+    org.springframework.cloud.gateway: TRACE
