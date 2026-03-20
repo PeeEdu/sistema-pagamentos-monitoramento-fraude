@@ -31,7 +31,7 @@ dependencies {
     // Validação (Bean Validation)
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-    // MongoDB (SEM JPA!)
+    // MongoDB
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
     // ✅ Redis
