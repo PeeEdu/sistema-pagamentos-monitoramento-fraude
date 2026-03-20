@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/bank-account")
+@RequestMapping("/api/bank-account")
 @RequiredArgsConstructor
 public class BankAccountController {
     private final BankAccountService bankAccountService;

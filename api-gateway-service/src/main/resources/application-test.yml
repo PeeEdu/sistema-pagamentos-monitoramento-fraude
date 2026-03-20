@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: api-gateway-test
+
+  cloud:
+    gateway:
+      enabled: true
+      routes: []
+
+server:
+  port: 0
+
+# Desabilitar Swagger nos testes
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+logging:
+  level:
+    root: WARN
+    com.gateway: INFO

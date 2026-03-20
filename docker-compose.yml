@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   # ==========================
   # MongoDB - Banco Principal
@@ -37,7 +35,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: [ "CMD", "redis-cli", "-a", "redis123", "ping" ]
+      test: ["CMD", "redis-cli", "-a", "redis123", "ping"]
       interval: 10s
       timeout: 3s
       retries: 5
@@ -127,10 +125,12 @@ services:
       - app-network
 
   # ==========================
-  # API GATEWAY ⭐ NOVO
+  # API GATEWAY (BÁSICO)
   # ==========================
   api-gateway:
-    build: ./api-gateway
+    build:
+      context: ./api-gateway-service
+      dockerfile: Dockerfile
     container_name: api-gateway
     depends_on:
       redis:
@@ -142,28 +142,17 @@ services:
       transfer-service:
         condition: service_started
     environment:
-      # Spring
-      SPRING_PROFILES_ACTIVE: docker
       SERVER_PORT: 8080
-
-      # Redis
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: redis123
-
-      # JWT
-      JWT_SECRET: your-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm-to-work-properly-in-production
-      JWT_EXPIRATION: 86400000
-
-      # Services URLs
       USER_SERVICE_URL: http://user-service:8081
       BANK_ACCOUNT_SERVICE_URL: http://bank-account-service:8082
       TRANSFER_SERVICE_URL: http://transfer-service:8083
-
-      # Eureka (desabilitado por padrão)
-      EUREKA_ENABLED: false
+      NOTIFICATION_SERVICE_URL: http://notification-service:8084
+      FRAUD_SERVICE_URL: http://fraud-service:8085
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: redis123
     ports:
-      - "8080:8080"  # Gateway na porta 8080
+      - "8080:8080"
     networks:
       - app-network
     restart: unless-stopped
@@ -190,7 +179,6 @@ services:
       SERVER_PORT: 8081
       SPRING_DATA_MONGODB_URI: mongodb://admin:admin123@mongodb:27017/user_db?authSource=admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      # ✅ Configurações JWT
       JWT_SECRET: your-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm-to-work-properly-in-production
       JWT_EXPIRATION: 86400000
     ports:
@@ -199,7 +187,7 @@ services:
       - app-network
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/actuator/health" ]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -220,12 +208,12 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SERVER_PORT: 8082
     ports:
-      - "8082:8082"  # Mudei de 8083 para 8082
+      - "8082:8082"
     networks:
       - app-network
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8082/actuator/health" ]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8082/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -246,12 +234,12 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SERVER_PORT: 8083
     ports:
-      - "8083:8083"  # Mudei de 8086 para 8083
+      - "8083:8083"
     networks:
       - app-network
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8083/actuator/health" ]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8083/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -274,7 +262,7 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SERVER_PORT: 8084
     ports:
-      - "8084:8084"  # Mudei de 8085 para 8084
+      - "8084:8084"
     networks:
       - app-network
     restart: unless-stopped
@@ -300,7 +288,7 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SERVER_PORT: 8085
     ports:
-      - "8085:8085"  # Mudei de 8087 para 8085
+      - "8085:8085"
     networks:
       - app-network
     restart: unless-stopped
