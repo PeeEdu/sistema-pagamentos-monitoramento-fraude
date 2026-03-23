@@ -1,5 +1,5 @@
 server:
-  port: ${SERVER_PORT:8081}  # ✅ Mudei para 8081 (Gateway usa 8080)
+  port: ${SERVER_PORT:8081}
 
 spring:
   application:

@@ -25,7 +25,7 @@ public class ProxyService {
             String body) {
 
         String targetUrl = buildTargetUrl(targetServiceUrl, request);
-        log.debug("Proxying to: {}", targetUrl);
+        log.info("Proxying {} to: {}", request.getMethod(), targetUrl);
 
         WebClient.RequestBodySpec requestSpec = webClientBuilder.build()
                 .method(HttpMethod.valueOf(request.getMethod()))
@@ -39,8 +39,9 @@ public class ProxyService {
         return requestSpec
                 .retrieve()
                 .toEntity(String.class)
-                .doOnSuccess(response -> log.info("Response status: {}", response.getStatusCode()))
-                .doOnError(error -> log.error("Error proxying request: {}", error.getMessage()));
+                .doOnSuccess(response -> log.info("✅ Proxied successfully: {} {}",
+                        response.getStatusCode(), targetUrl))
+                .doOnError(error -> log.error("❌ Proxy error: {}", error.getMessage()));
     }
 
     private String buildTargetUrl(String targetServiceUrl, HttpServletRequest request) {
@@ -56,8 +57,10 @@ public class ProxyService {
         while (headerNames.hasMoreElements()) {
             String headerName = headerNames.nextElement();
 
+            // Não copiar headers específicos
             if (!headerName.equalsIgnoreCase("host") &&
-                    !headerName.equalsIgnoreCase("content-length")) {
+                    !headerName.equalsIgnoreCase("content-length") &&
+                    !headerName.toLowerCase().startsWith("access-control")) {
                 headers.add(headerName, request.getHeader(headerName));
             }
         }
