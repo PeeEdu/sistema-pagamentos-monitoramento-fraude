@@ -52,7 +52,7 @@ public class AuthService {
 
         return AuthResponse.builder()
                 .token(token)
-                .userId(user.getId())
+                .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .message("Login realizado com sucesso")
@@ -94,7 +94,7 @@ public class AuthService {
 
         return AuthResponse.builder()
                 .token(token)
-                .userId(user.getId())
+                .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .message("Usuário registrado com sucesso")
