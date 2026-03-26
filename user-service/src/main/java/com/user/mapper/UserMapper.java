@@ -1,6 +1,6 @@
 package com.user.mapper;
 
-import com.user.dto.request.CreateUserRequest;
+import com.user.dto.request.RegisterRequest;
 import com.user.dto.response.UserCreateResponse;
 import com.user.dto.response.UserResponse;
 import com.user.entities.UserEntity;
@@ -17,6 +17,15 @@ import java.time.ZoneId;
         imports = {Instant.class, LocalDateTime.class, ZoneId.class}
 )
 public interface UserMapper {
+
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "email", source = "email")
+    @Mapping(target = "password", source = "password")
+    @Mapping(target = "cpf", source = "cpf")
+    @Mapping(target = "phone", source = "phone")
+    @Mapping(target = "active", constant = "true")
+    UserEntity toEntity(RegisterRequest request);
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
@@ -42,12 +51,6 @@ public interface UserMapper {
     @Mapping(target = "email", source = "email")
     @Mapping(target = "createdAt", expression = "java(convertInstantToLocalDateTime(userEntity.getCreatedAt()))")
     UserCreatedEvent toUserCreatedEvent(UserEntity userEntity);
-
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "active", ignore = true)
-    UserEntity toEntity(CreateUserRequest createUserRequest);
 
     default LocalDateTime convertInstantToLocalDateTime(Instant instant) {
         if (instant == null) {

@@ -32,7 +32,7 @@ public class DuplicateTransactionValidator implements FraudValidator {
         if (exists) {
             log.warn("⚠️ Duplicação detectada: {}", event.getTransferId());
             fraudTypes.add(FraudType.DUPLICATE_TRANSACTION);
-            riskScore = 40.0;
+            riskScore = 60.0;
         } else {
             redisTemplate.opsForValue().set(key, "1", 1, TimeUnit.MINUTES);
         }

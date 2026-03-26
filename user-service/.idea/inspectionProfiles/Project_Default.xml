@@ -6,15 +6,24 @@
       <option name="ignoredModules">
         <list>
           <option value="desafio-mensageria" />
+          <option value="user-service" />
+          <option value="user-service" />
+          <option value="user-service" />
         </list>
       </option>
       <option name="ignoredPackages">
         <list>
           <option value="org.apache.commons:commons-lang3:3.14.0" />
+          <option value="org.apache.commons:commons-lang3:3.14.0" />
+          <option value="commons-fileupload:commons-fileupload:1.5" />
+          <option value="commons-io:commons-io:2.8.0" />
         </list>
       </option>
       <option name="ignoredReasons">
         <list>
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
           <option value="Not exploitable" />
         </list>
       </option>

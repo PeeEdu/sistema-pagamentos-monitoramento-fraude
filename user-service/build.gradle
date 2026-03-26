@@ -36,7 +36,7 @@ dependencies {
 
     // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 
     // Security
@@ -53,6 +53,21 @@ dependencies {
 
     // Swagger/OpenAPI
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+    // ✅ CAMUNDA BPM (ADICIONAR ISSO)
+    implementation 'org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-rest:7.21.0'
+    implementation 'org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-webapp:7.21.0'
+
+    // ✅ Banco H2 para Camunda (desenvolvimento)
+    runtimeOnly 'com.h2database:h2'
+
+    // ✅ JDBC Starter (necessário para Camunda)
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
+    // Camunda Spin - Para serialização JSON ⭐ ADICIONE ESTAS
+    implementation 'org.camunda.bpm:camunda-engine-plugin-spin:7.21.0'
+    implementation 'org.camunda.spin:camunda-spin-dataformat-json-jackson:1.23.0'
+    implementation 'org.camunda.spin:camunda-spin-core:1.23.0'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'

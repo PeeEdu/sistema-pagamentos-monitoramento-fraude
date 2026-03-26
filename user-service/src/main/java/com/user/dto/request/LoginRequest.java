@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LoginRequest {
 
-    @NotBlank(message = "Email é obrigatório")
-    private String email;
+    @NotBlank(message = "CPF é obrigatório")
+    private String cpf;
 
     @NotBlank(message = "Senha é obrigatória")
     private String password;

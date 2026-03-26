@@ -27,18 +27,18 @@ public class AuthService {
     private final UserValidator userValidator;
 
     public AuthResponse login(LoginRequest request) {
-        log.info("Login attempt for email: {}", request.getEmail());
+        log.info("Login attempt for CPF: {}", maskCpf(request.getCpf()));
 
-        UserEntity user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new InvalidCredentialsException("Email ou senha inválidos"));
+        UserEntity user = userRepository.findByCpf(request.getCpf())
+                .orElseThrow(() -> new InvalidCredentialsException("CPF ou senha inválidos"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            log.warn("Invalid password for email: {}", request.getEmail());
-            throw new InvalidCredentialsException("Email ou senha inválidos");
+            log.warn("Invalid password for CPF: {}", maskCpf(request.getCpf()));
+            throw new InvalidCredentialsException("CPF ou senha inválidos");
         }
 
         if (!user.isActive()) {
-            log.warn("Inactive user tried to login: {}", request.getEmail());
+            log.warn("Inactive user tried to login: {}", maskCpf(request.getCpf()));
             throw new InvalidCredentialsException("Usuário inativo");
         }
 
@@ -48,7 +48,7 @@ public class AuthService {
                 user.getName()
         );
 
-        log.info("User {} logged in successfully", user.getEmail());
+        log.info("User with CPF {} logged in successfully", maskCpf(request.getCpf()));
 
         return AuthResponse.builder()
                 .token(token)
@@ -103,5 +103,10 @@ public class AuthService {
 
     public boolean validateToken(String token) {
         return jwtUtil.validateToken(token);
+    }
+
+    private String maskCpf(String cpf) {
+        if (cpf == null || cpf.length() < 11) return "***";
+        return cpf.substring(0, 3) + ".***.***-" + cpf.substring(9);
     }
 }

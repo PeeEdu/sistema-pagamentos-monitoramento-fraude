@@ -1,14 +1,10 @@
 package com.user.service;
 
-import com.user.dto.request.CreateUserRequest;
-import com.user.dto.response.UserCreateResponse;
 import com.user.dto.response.UserResponse;
 import com.user.entities.UserEntity;
 import com.user.exceptions.UserNotFoundException;
 import com.user.mapper.UserMapper;
-import com.user.producer.UserEventProducer;
 import com.user.repository.UserRepository;
-import com.user.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

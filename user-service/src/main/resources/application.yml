@@ -5,10 +5,24 @@ spring:
   application:
     name: user-service
 
+  # ==================== MongoDB (seus dados) ====================
   data:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI:mongodb://admin:admin123@localhost:27017/user_db?authSource=admin}
 
+  # ==================== Camunda Database (H2) ====================
+  datasource:
+    url: jdbc:h2:file:./camunda-h2-database
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: sa
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # ==================== Kafka ====================
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
@@ -17,13 +31,42 @@ spring:
       properties:
         spring.json.add.type.headers: false
 
+# ==================== Camunda BPM Configuration ====================
+camunda:
+  bpm:
+    admin-user:
+      id: ${CAMUNDA_ADMIN_USER:admin}
+      password: ${CAMUNDA_ADMIN_PASSWORD:admin}
+      firstName: Admin
+      lastName: User
+      email: admin@example.com
+
+    filter:
+      create: All tasks
+
+    authorization:
+      enabled: true
+
+    history-level: ${CAMUNDA_HISTORY_LEVEL:full}
+
+    database:
+      schema-update: true
+      type: h2
+
+    job-execution:
+      enabled: true
+      deployment-aware: true
+
+    webapp:
+      index-redirect-enabled: true
+
 # ==================== JWT Configuration ====================
 jwt:
   secret: ${JWT_SECRET:your-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm-to-work-properly-in-production-environment}
   expiration: ${JWT_EXPIRATION:86400000}  # 24 horas em milissegundos
   refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}  # 7 dias
 
-# Swagger/OpenAPI
+# ==================== Swagger/OpenAPI ====================
 springdoc:
   api-docs:
     path: /v3/api-docs
@@ -34,14 +77,14 @@ springdoc:
     operations-sorter: method
     tags-sorter: alpha
 
-# Tópicos Kafka
+# ==================== Tópicos Kafka ====================
 kafka:
   topics:
     user-created: ${KAFKA_TOPIC_USER_CREATED:user-created-topic}
     user-updated: ${KAFKA_TOPIC_USER_UPDATED:user-updated-topic}
     user-deleted: ${KAFKA_TOPIC_USER_DELETED:user-deleted-topic}
 
-# Logging
+# ==================== Logging ====================
 logging:
   level:
     root: INFO
@@ -49,17 +92,18 @@ logging:
     org.springframework.web: DEBUG
     org.springframework.data.mongodb: DEBUG
     org.springframework.security: DEBUG
+    org.camunda.bpm: DEBUG
     com.user: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
-# Actuator
+# ==================== Actuator ====================
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,camunda
   endpoint:
     health:
       show-details: always

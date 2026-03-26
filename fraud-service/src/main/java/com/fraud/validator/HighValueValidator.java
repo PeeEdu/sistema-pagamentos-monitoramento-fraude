@@ -24,7 +24,7 @@ public class HighValueValidator implements FraudValidator {
         if (event.getAmount().compareTo(HIGH_VALUE_THRESHOLD) > 0) {
             log.warn("⚠️ Valor alto detectado: {}", event.getAmount());
             fraudTypes.add(FraudType.HIGH_VALUE);
-            riskScore = 20.0;
+            riskScore = 40.0;
         }
 
         return FraudAnalysisResult.builder()
