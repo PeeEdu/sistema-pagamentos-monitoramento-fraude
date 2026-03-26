@@ -33,6 +33,8 @@ public class SendKafkaEventDelegate implements JavaDelegate {
                 mapper.toUserCreatedEvent(user)
         );
 
+
+
         log.info("✅ Kafka event sent successfully for user ID: {}", userData.getId());
     }
 }

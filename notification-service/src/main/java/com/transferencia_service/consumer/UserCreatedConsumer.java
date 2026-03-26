@@ -37,7 +37,7 @@ public class UserCreatedConsumer {
             log.info("✅ Notificação processada com sucesso para: {}", event.getEmail());
         } catch (Exception e) {
             log.error("❌ Erro ao processar evento: {}", event, e);
-            // TODO: Implementar retry ou dead letter queue
+            throw e; // relança para o error handler do Kafka
         }
     }
 }

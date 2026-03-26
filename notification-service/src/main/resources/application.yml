@@ -14,11 +14,6 @@ spring:
     consumer:
       group-id: notification-service-group
       auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.trusted.packages: "*"
-        spring.json.value.default.type: com.bank_account.event.UserCreatedEvent
 
   mail:
     host: smtp.gmail.com
@@ -46,4 +41,4 @@ logging:
     root: INFO
     org.springframework.kafka: DEBUG
     org.springframework.web: DEBUG
-    com.bank_account: DEBUG
+    com.transferencia_service: DEBUG

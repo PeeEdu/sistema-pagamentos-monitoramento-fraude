@@ -1,0 +1,21 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: notification-service-group-test
+      auto-offset-reset: earliest
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/notification_test_db
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: test@gmail.com
+    password: test
+
+kafka:
+  topics:
+    user-created: user-created-topic-test
+    transaction-notification: transaction-notification-topic-test
