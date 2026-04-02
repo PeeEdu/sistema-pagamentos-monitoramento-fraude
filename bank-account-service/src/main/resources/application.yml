@@ -40,9 +40,11 @@ kafka:
     user-created: ${KAFKA_TOPIC_USER_CREATED:user-created-topic}
     transfer-validated: ${KAFKA_TOPIC_TRANSFER_VALIDATED:transfer-validated-topic}
 
-    #Produz
+    # Produz
     bank-account-created: ${KAFKA_TOPIC_BANK_ACCOUNT_CREATED:bank-account-created-topic}
     transfer-completed: ${KAFKA_TOPIC_TRANSFER_COMPLETED:transfer-completed-topic}
+    pix-key-created: ${KAFKA_TOPIC_PIX_KEY_CREATED:pix-key-created-topic}
+    pix-key-deleted: ${KAFKA_TOPIC_PIX_KEY_DELETED:pix-key-deleted-topic}
 
 logging:
   level:

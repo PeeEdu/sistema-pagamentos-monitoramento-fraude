@@ -36,11 +36,13 @@ springdoc:
 
 kafka:
   topics:
-    #Produz
+    # Produz
     transfer-initiated: ${KAFKA_TOPIC_TRANSFER_INITIATED:transfer-initiated-topic}
 
-    #Consome
+    # Consome
     transfer-completed: ${KAFKA_TOPIC_TRANSFER_COMPLETED:transfer-completed-topic}
+    pix-key-created: ${KAFKA_TOPIC_PIX_KEY_CREATED:pix-key-created-topic}
+    pix-key-deleted: ${KAFKA_TOPIC_PIX_KEY_DELETED:pix-key-deleted-topic}
 
 logging:
   level:

@@ -41,4 +41,7 @@ logging:
     root: INFO
     org.springframework.kafka: DEBUG
     org.springframework.web: DEBUG
+    org.springframework.mail: DEBUG
+    org.eclipse.angus.mail: DEBUG
+    jakarta.mail: DEBUG
     com.transferencia_service: DEBUG

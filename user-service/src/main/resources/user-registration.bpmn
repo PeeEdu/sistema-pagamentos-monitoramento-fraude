@@ -45,6 +45,9 @@
     <bpmn:sequenceFlow id="Flow_6" sourceRef="Task_GenerateToken" targetRef="EndEvent_Success" />
     <bpmn:startEvent id="StartEvent" name="Início do Registro">
       <bpmn:outgoing>Flow_1</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_1r0umsp">
+        <bpmn:targetRef>DataObjectReference_12dfjue</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
       <bpmn:messageEventDefinition id="MessageEventDefinition_1jgokun" messageRef="Message_3ebhg9f" />
     </bpmn:startEvent>
     <bpmn:dataObjectReference id="DataObjectReference_12dfjue" name="AuthRegisterDTO" dataObjectRef="DataObject_1g1wjxb" />
@@ -96,7 +99,7 @@
       <bpmndi:BPMNShape id="DataObjectReference_12dfjue_di" bpmnElement="DataObjectReference_12dfjue">
         <dc:Bounds x="152" y="85" width="36" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="127" y="142" width="87" height="14" />
+          <dc:Bounds x="126" y="61" width="87" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
@@ -130,6 +133,10 @@
       <bpmndi:BPMNEdge id="Flow_6_di" bpmnElement="Flow_6">
         <di:waypoint x="1050" y="280" />
         <di:waypoint x="1102" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_1r0umsp_di" bpmnElement="DataOutputAssociation_1r0umsp">
+        <di:waypoint x="170" y="262" />
+        <di:waypoint x="168" y="135" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

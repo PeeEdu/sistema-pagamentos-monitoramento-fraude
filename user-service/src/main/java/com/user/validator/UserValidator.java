@@ -28,7 +28,7 @@ public class UserValidator {
         }
     }
 
-    public void validatePhoneNotExists(String phone) {  // ← ADICIONAR
+    public void validatePhoneNotExists(String phone) {
         if (userRepository.existsByPhone(phone)) {
             log.warn("Attempt to create user with existing phone: {}", phone);
             throw new UserAlreadyExistsException("Usuário com telefone '" + phone + "' já existe");
@@ -42,7 +42,6 @@ public class UserValidator {
         }
     }
 
-    // ✅ MÉTODO HELPER: Validar tudo de uma vez
     public void validateNewUser(String email, String cpf, String phone) {
         validateEmailNotExists(email);
         validateCpfNotExists(cpf);
