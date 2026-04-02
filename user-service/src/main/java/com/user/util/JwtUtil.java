@@ -21,7 +21,7 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration:86400000}") // 24 horas
+    @Value("${jwt.expiration:86400000}")
     private Long expiration;
 
     private SecretKey getSigningKey() {
@@ -29,7 +29,6 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // Gerar token usando email como subject
     public String generateToken(String userId, String email, String name) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
@@ -51,7 +50,6 @@ public class JwtUtil {
                 .compact();
     }
 
-    // Validar token
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
@@ -65,7 +63,6 @@ public class JwtUtil {
         }
     }
 
-    // Extrair email (subject)
     public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
     }

@@ -29,11 +29,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable) // ✅ Desabilitar CORS (Gateway cuida disso)
+                .cors(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ Rotas públicas (usar AntPathRequestMatcher)
                         .requestMatchers(
                                 new AntPathRequestMatcher("/api/auth/**"),
                                 new AntPathRequestMatcher("/actuator/**"),
@@ -43,11 +42,7 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/swagger-ui.html"),
                                 new AntPathRequestMatcher("/webjars/**")
                         ).permitAll()
-
-                        // Rotas protegidas
                         .requestMatchers(new AntPathRequestMatcher("/api/users/**")).authenticated()
-
-                        // ✅ IMPORTANTE: Permitir tudo por padrão (para debug)
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

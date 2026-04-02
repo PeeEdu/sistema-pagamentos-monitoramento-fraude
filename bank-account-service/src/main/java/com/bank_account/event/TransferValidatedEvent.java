@@ -29,7 +29,7 @@ public class TransferValidatedEvent {
     private String initiatedBy;
 
     private boolean approved;
-    private double riskScore;
+    private BigDecimal riskScore;
     private List<FraudType> fraudTypes;
     private String rejectionReason;
 

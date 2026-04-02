@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class TransferController {
 
     private final TransferService transferService;
-    private final StatementService statementService; // ← NOVO
+    private final StatementService statementService;
 
     @PostMapping("/pix")
     public ResponseEntity<?> createTransfer(@RequestBody @Valid CreatePixTransferRequest createPixTransferRequest){
@@ -60,7 +60,6 @@ public class TransferController {
                 .build());
     }
 
-    // ← Extrato completo (para admin/debug)
     @GetMapping("/extract/user/{userId}/all")
     public ResponseEntity<BaseResponse<Page<Transfer>>> getAllExtractByUserId(
             @PathVariable String userId,

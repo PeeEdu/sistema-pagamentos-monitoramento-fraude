@@ -22,22 +22,18 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI customOpenApi() {
-        // Servidor local
         Server localServer = new Server();
         localServer.setUrl("http://localhost:" + serverPort);
         localServer.setDescription("User Service - Local");
 
-        // Contato
         Contact contact = new Contact()
                 .name("Bank Account Team")
                 .email("pedro.edu2168@gmail.com");
 
-        // Licença
         License license = new License()
                 .name("Apache 2.0")
                 .url("https://www.apache.org/licenses/LICENSE-2.0");
 
-        // Informações da API
         Info info = new Info()
                 .title("User Service API")
                 .version("1.0.0")
@@ -46,13 +42,11 @@ public class OpenApiConfig {
                 .contact(contact)
                 .license(license);
 
-        // Nome do esquema de segurança
         final String securitySchemeName = "Bearer Authentication";
 
         return new OpenAPI()
                 .info(info)
                 .servers(List.of(localServer))
-                // Adicionar esquema de segurança JWT
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()
                         .addSecuritySchemes(securitySchemeName, new SecurityScheme()

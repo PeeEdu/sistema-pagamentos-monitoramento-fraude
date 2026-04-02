@@ -19,7 +19,6 @@ public class ValidateUserDataDelegate implements JavaDelegate {
         UserRegistrationData data = (UserRegistrationData)
                 execution.getVariable("registrationData");
 
-        // Validações básicas (se necessário)
         if (data == null) {
             throw new IllegalArgumentException("Registration data cannot be null");
         }

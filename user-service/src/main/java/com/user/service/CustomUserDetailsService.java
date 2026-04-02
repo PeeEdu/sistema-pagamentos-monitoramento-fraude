@@ -30,9 +30,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())
                 .password(user.getPassword())
-                .authorities("ROLE_USER")  // Você pode adicionar roles aqui
+                .authorities("ROLE_USER")
                 .accountExpired(false)
-                .accountLocked(!user.isActive())  // Se inativo, conta bloqueada
+                .accountLocked(!user.isActive())
                 .credentialsExpired(false)
                 .disabled(!user.isActive())
                 .build();

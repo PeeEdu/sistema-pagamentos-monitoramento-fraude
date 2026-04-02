@@ -19,10 +19,10 @@ import java.util.LinkedHashMap;
 public class PixKeyEventConsumer {
 
     private final AccountPixKeyRepository accountPixKeyRepository;
-    private final ObjectMapper objectMapper; // ← Adicionar
+    private final ObjectMapper objectMapper;
 
     @KafkaListener(topics = "${kafka.topics.pix-key-created}", groupId = "${spring.kafka.consumer.group-id}")
-    public void handlePixKeyCreated(LinkedHashMap<String, Object> eventData) { // ← Usar LinkedHashMap
+    public void handlePixKeyCreated(LinkedHashMap<String, Object> eventData) {
         log.info("📥 Recebido evento PixKeyCreated: {}", eventData);
 
         try {
