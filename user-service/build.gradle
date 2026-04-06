@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.1'
     id 'io.spring.dependency-management' version '1.1.5'
+    id 'jacoco'
 }
 
 group = 'com.'
@@ -11,6 +12,50 @@ description = 'Um aplicativo para desafio de mensageria'
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+jacocoTestReport {
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    '**/config/**',
+                    '**/dto/**',
+                    '**/entities/**',
+                    '**/exceptions/**',
+                    '**/event/**',
+                    '**/repository/**',
+                    '**/*Application.class'
+            ])
+        }))
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.80
+            }
+        }
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    '**/config/**',
+                    '**/dto/**',
+                    '**/entities/**',
+                    '**/exceptions/**',
+                    '**/event/**',
+                    '**/repository/**',
+                    '**/*Application.class'
+            ])
+        }))
     }
 }
 
@@ -27,6 +72,9 @@ repositories {
 dependencies {
     // Spring Boot Web
     implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    //Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     // Validação (Bean Validation)
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -86,8 +134,17 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-
-
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy tasks.named('jacocoTestReport')
+}
+
+tasks.named('jacocoTestReport') {
+    dependsOn tasks.named('test')
+
+    reports {
+        xml.required = true
+        csv.required = false
+        html.required = true
+    }
 }

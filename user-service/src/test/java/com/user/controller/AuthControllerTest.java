@@ -1,12 +1,16 @@
 package com.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.user.dto.request.ChangePasswordRequest;
 import com.user.dto.request.LoginRequest;
+import com.user.dto.request.PasswordResetRequest;
 import com.user.dto.request.RegisterRequest;
 import com.user.dto.response.AuthResponse;
 import com.user.service.AuthService;
 import com.user.stub.AuthResponseStub;
+import com.user.stub.ChangePasswordRequestStub;
 import com.user.stub.LoginRequestStub;
+import com.user.stub.PasswordResetRequestStub;
 import com.user.stub.RegisterRequestStub;
 import com.user.stub.UserRegistrationDataStub;
 import com.user.workflow.dto.UserRegistrationData;
@@ -22,6 +26,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -230,5 +235,90 @@ class AuthControllerTest {
                 .andExpect(content().string("false"));
 
         verify(authService).validateToken("mocked-jwt-token");
+    }
+
+    @Test
+    void requestPasswordReset_DeveRetornarStatus200ComMensagemDeSucesso_QuandoEmailForValido() throws Exception {
+        String request = """
+            {
+              "email": "joao.silva@email.com"
+            }
+            """;
+
+        when(authService.requestPasswordReset("joao.silva@email.com"))
+                .thenReturn("Email de redefinição de senha enviado com sucesso");
+
+        mockMvc.perform(
+                        post(BASE_URL + "/reset-request")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(request))
+                .andExpect(status().isOk())
+                .andExpect(content().json("""
+            {
+              "data": null,
+              "message": "Email de redefinição de senha enviado com sucesso",
+              "o": null
+            }
+            """));
+
+        verify(authService).requestPasswordReset("joao.silva@email.com");
+    }
+
+    @Test
+    void requestPasswordReset_DeveRetornarStatus400_QuandoEmailForInvalido() throws Exception {
+        String requestInvalido = """
+            {
+              "email": ""
+            }
+            """;
+
+        mockMvc.perform(
+                        post(BASE_URL + "/reset-request")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestInvalido))
+                .andExpect(status().isBadRequest());
+
+        verify(authService, never()).requestPasswordReset(anyString());
+    }
+
+    @Test
+    void resetPassword_DeveRetornarStatus200ComMensagemDeSucesso_QuandoTokenENovaSenhaForemValidos() throws Exception {
+        ChangePasswordRequest request = ChangePasswordRequestStub.buildRequest();
+
+        when(authService.resetPassword(request.getToken(), request.getNewPassword()))
+                .thenReturn("Senha redefinida com sucesso");
+
+        mockMvc.perform(
+                        post(BASE_URL + "/reset-password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(MAPPER.writeValueAsBytes(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().json("""
+                    {
+                      "data": null,
+                      "message": "Senha redefinida com sucesso",
+                      "o": null
+                    }
+                    """));
+
+        verify(authService).resetPassword(request.getToken(), request.getNewPassword());
+    }
+
+    @Test
+    void resetPassword_DeveRetornarStatus400_QuandoTokenOuNovaSenhaForemInvalidos() throws Exception {
+        String requestInvalido = """
+                {
+                  "token": "",
+                  "newPassword": ""
+                }
+                """;
+
+        mockMvc.perform(
+                        post(BASE_URL + "/reset-password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestInvalido))
+                .andExpect(status().isBadRequest());
+
+        verify(authService, never()).resetPassword(anyString(), anyString());
     }
 }

@@ -14,27 +14,38 @@ spring:
     consumer:
       group-id: notification-service-group
       auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.add.type.headers: true
+        spring.json.trusted.packages: "com.transferencia_service.event"
 
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${MAIL_USERNAME:estudosti877@gmail.com}
-    password: ${MAIL_PASSWORD}
+    host: ${MAIL_HOST:mailhog}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    protocol: smtp
     properties:
       mail:
+        debug: true
         smtp:
-          auth: true
+          auth: false
           starttls:
-            enable: true
-            required: true
+            enable: false
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
+
+app:
+  frontend:
+    url: ${FRONTEND_URL:http://localhost:3000}
 
 kafka:
   topics:
     user-created: ${KAFKA_TOPIC_USER_CREATED:user-created-topic}
     transaction-notification: ${KAFKA_TOPIC_TRANSACTION_NOTIFICATION:transaction-notification-topic}
+    password-reset: ${KAFKA_TOPIC_PASSWORD_RESET:password-reset-topic}
 
 logging:
   level:

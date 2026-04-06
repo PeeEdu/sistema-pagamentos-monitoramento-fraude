@@ -8,7 +8,11 @@ spring:
   # ==================== MongoDB (seus dados) ====================
   data:
     mongodb:
-      uri: ${SPRING_DATA_MONGODB_URI:mongodb://admin:admin123@localhost:27017/user_db?authSource=admin}
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://admin:admin123@localhost:27017/user_db?authSource=admin
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+      password: ${SPRING_DATA_REDIS_PASSWORD:redis123}
 
   # ==================== Camunda Database (H2) ====================
   datasource:
@@ -29,7 +33,7 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
-        spring.json.add.type.headers: false
+        spring.json.add.type.headers: true  # ✅ MUDANÇA PRINCIPAL
 
 # ==================== Camunda BPM Configuration ====================
 camunda:
@@ -83,6 +87,7 @@ kafka:
     user-created: ${KAFKA_TOPIC_USER_CREATED:user-created-topic}
     user-updated: ${KAFKA_TOPIC_USER_UPDATED:user-updated-topic}
     user-deleted: ${KAFKA_TOPIC_USER_DELETED:user-deleted-topic}
+    password-reset: ${KAFKA_TOPIC_PASSWORD_RESET:password-reset-topic}
 
 # ==================== Logging ====================
 logging:

@@ -1,8 +1,11 @@
 package com.user.controller;
 
+import com.user.dto.request.ChangePasswordRequest;
 import com.user.dto.request.LoginRequest;
+import com.user.dto.request.PasswordResetRequest;
 import com.user.dto.request.RegisterRequest;
 import com.user.dto.response.AuthResponse;
+import com.user.dto.response.BaseResponse;
 import com.user.service.AuthService;
 import com.user.workflow.dto.UserRegistrationData;
 import com.user.workflow.mapper.ProcessVariableMapper;
@@ -16,6 +19,9 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @RestController
@@ -75,5 +81,28 @@ public class AuthController {
         String jwtToken = token.replace("Bearer ", "");
         boolean isValid = authService.validateToken(jwtToken);
         return ResponseEntity.ok(isValid);
+    }
+
+    @PostMapping("/reset-request")
+    public ResponseEntity<BaseResponse<String>> requestPasswordReset(@RequestBody @Valid PasswordResetRequest request) {
+        log.info("Password reset request received for email: {}", request.getEmail());
+        String response = authService.requestPasswordReset(request.getEmail());
+
+        return ResponseEntity.ok(new BaseResponse<>(
+                null,           // data
+                response,       // message
+                null           // o
+        ));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<BaseResponse<String>> resetPassword(@RequestBody @Valid ChangePasswordRequest request) {
+        String response = authService.resetPassword(request.getToken(), request.getNewPassword());
+
+        return ResponseEntity.ok(new BaseResponse<>(
+                null,
+                response,
+                null
+        ));
     }
 }

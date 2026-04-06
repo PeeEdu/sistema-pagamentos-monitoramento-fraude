@@ -5,6 +5,6 @@ import lombok.Builder;
 @Builder
 public record BaseResponse<T>(
         T data,
-        String message
-) {
+        String message,
+        Object o) {
 }

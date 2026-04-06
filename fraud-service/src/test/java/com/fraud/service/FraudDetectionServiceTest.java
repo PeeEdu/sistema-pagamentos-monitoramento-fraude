@@ -84,7 +84,7 @@ class FraudDetectionServiceTest {
 
         verify(validator1).validate(event);
         verify(validator2).validate(event);
-        verify(redisTemplate).opsForList();
+        verify(redisTemplate, times(2)).opsForList();
         verify(listOperations).leftPush("transfer:history:123456", event);
         verify(listOperations).trim("transfer:history:123456", 0, 9);
         verify(redisTemplate).expire("transfer:history:123456", 1, TimeUnit.HOURS);

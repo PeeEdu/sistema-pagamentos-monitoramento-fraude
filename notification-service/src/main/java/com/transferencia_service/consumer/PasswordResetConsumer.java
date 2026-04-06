@@ -1,6 +1,6 @@
 package com.transferencia_service.consumer;
 
-import com.transferencia_service.event.UserCreatedEvent;
+import com.transferencia_service.event.PasswordResetRequestedEvent;
 import com.transferencia_service.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,30 +13,30 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class UserCreatedConsumer {
+public class PasswordResetConsumer {
 
     private final NotificationService notificationService;
 
     @KafkaListener(
-            topics = "${kafka.topics.user-created}",
+            topics = "${kafka.topics.password-reset}",
             groupId = "${spring.kafka.consumer.group-id}",
-            containerFactory = "userCreatedKafkaListenerContainerFactory"
+            containerFactory = "passwordResetKafkaListenerContainerFactory"
     )
     public void consume(
-            @Payload UserCreatedEvent event,
+            @Payload PasswordResetRequestedEvent event,
             @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic
     ) {
-        log.info("📨 Mensagem recebida do tópico: {} - Partition: {}, Offset: {}",
+        log.info("📨 Mensagem de reset recebida do tópico: {} - Partition: {}, Offset: {}",
                 topic, partition, offset);
-        log.info("📧 Evento: {}", event);
+        log.info("🔐 Evento: {}", event);
 
         try {
-            notificationService.processUserCreatedEvent(event);
-            log.info("✅ Notificação processada com sucesso para: {}", event.getEmail());
+            notificationService.processPasswordResetEvent(event);
+            log.info("✅ Email de reset processado com sucesso para: {}", event.getEmail());
         } catch (Exception e) {
-            log.error("❌ Erro ao processar evento: {}", event, e);
+            log.error("❌ Erro ao processar evento de reset: {}", event, e);
             throw e;
         }
     }

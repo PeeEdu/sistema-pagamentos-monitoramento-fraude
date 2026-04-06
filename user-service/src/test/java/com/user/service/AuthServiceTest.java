@@ -3,18 +3,20 @@ package com.user.service;
 import com.user.dto.request.LoginRequest;
 import com.user.dto.request.RegisterRequest;
 import com.user.dto.response.AuthResponse;
+import com.user.entities.PasswordResetAuditEntity;
 import com.user.entities.UserEntity;
 import com.user.exceptions.InvalidCredentialsException;
+import com.user.exceptions.UserNotFoundException;
 import com.user.mapper.UserMapper;
 import com.user.producer.UserEventProducer;
+import com.user.repository.PasswordResetAuditRepository;
 import com.user.repository.UserRepository;
-import com.user.stub.LoginRequestStub;
-import com.user.stub.RegisterRequestStub;
-import com.user.stub.UserCreatedEventStub;
-import com.user.stub.UserEntityStub;
+import com.user.stub.*;
 import com.user.util.JwtUtil;
 import com.user.validator.UserValidator;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -30,6 +32,9 @@ class AuthServiceTest {
     private final UserEventProducer userEventProducer;
     private final UserMapper userMapper;
     private final UserValidator userValidator;
+    private final StringRedisTemplate stringRedisTemplate;
+    private final PasswordResetAuditRepository passwordResetAuditRepository;
+    private final ValueOperations<String, String> valueOperations;
     private final AuthService authService;
 
     AuthServiceTest() {
@@ -39,6 +44,11 @@ class AuthServiceTest {
         this.userEventProducer = mock(UserEventProducer.class);
         this.userMapper = mock(UserMapper.class);
         this.userValidator = mock(UserValidator.class);
+        this.stringRedisTemplate = mock(StringRedisTemplate.class);
+        this.passwordResetAuditRepository = mock(PasswordResetAuditRepository.class);
+        this.valueOperations = mock(ValueOperations.class);
+
+        when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
 
         this.authService = new AuthService(
                 userRepository,
@@ -46,9 +56,12 @@ class AuthServiceTest {
                 passwordEncoder,
                 userEventProducer,
                 userMapper,
-                userValidator
+                userValidator,
+                stringRedisTemplate,
+                passwordResetAuditRepository
         );
     }
+
 
     @Test
     void login_DeveRetornarAuthResponse_QuandoCredenciaisForemValidas() {
@@ -254,5 +267,195 @@ class AuthServiceTest {
 
         assertFalse(response);
         verify(jwtUtil).validateToken("mocked-jwt-token");
+    }
+    @Test
+    void requestPasswordReset_DeveRetornarMensagemDeSucesso_QuandoEmailExistir() {
+        UserEntity user = UserEntityStub.buildEntity();
+
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+
+        String response = authService.requestPasswordReset(user.getEmail());
+
+        assertEquals("Email de redefinição de senha enviado com sucesso", response);
+
+        verify(userRepository).findByEmail(user.getEmail());
+        verify(stringRedisTemplate).opsForValue();
+        verify(valueOperations).set(startsWith("password-reset:"), eq(user.getId()), eq(java.time.Duration.ofHours(1)));
+        verify(passwordResetAuditRepository).save(argThat(audit ->
+                audit.getUserId().equals(user.getId()) &&
+                        audit.getEmail().equals(user.getEmail()) &&
+                        audit.getStatus().equals("REQUESTED") &&
+                        audit.getToken() != null &&
+                        audit.getRequestedAt() != null &&
+                        audit.getExpiresAt() != null
+        ));
+        verify(userEventProducer).sendPasswordResetEvent(argThat(event ->
+                event.getUserId().equals(user.getId()) &&
+                        event.getEmail().equals(user.getEmail()) &&
+                        event.getUserName().equals(user.getName()) &&
+                        event.getResetToken() != null
+        ));
+    }
+
+    @Test
+    void requestPasswordReset_DeveLancarUserNotFoundException_QuandoEmailNaoExistir() {
+        when(userRepository.findByEmail("inexistente@email.com")).thenReturn(Optional.empty());
+
+        UserNotFoundException exception = assertThrows(
+                UserNotFoundException.class,
+                () -> authService.requestPasswordReset("inexistente@email.com")
+        );
+
+        assertEquals("Usuário com ID 'Usuário não encontrado' não encontrado", exception.getMessage());
+
+        verify(userRepository).findByEmail("inexistente@email.com");
+        verify(passwordResetAuditRepository, never()).save(any());
+        verify(userEventProducer, never()).sendPasswordResetEvent(any());
+    }
+
+    @Test
+    void resetPassword_DeveRedefinirSenhaComSucesso_QuandoTokenEUsuarioForemValidos() {
+        String token = "reset-token-123";
+        String redisKey = "password-reset:" + token;
+        String userId = "user-123";
+        String newPassword = "novaSenha123";
+
+        UserEntity user = UserEntityStub.buildEntity();
+        PasswordResetAuditEntity audit = PasswordResetAuditEntityStub.buildEntity();
+
+        when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get(redisKey)).thenReturn(userId);
+        when(passwordResetAuditRepository.findByToken(token)).thenReturn(Optional.of(audit));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(passwordEncoder.encode(newPassword)).thenReturn("senha-criptografada");
+
+        String response = authService.resetPassword(token, newPassword);
+
+        assertEquals("Senha redefinida com sucesso", response);
+        assertEquals("senha-criptografada", user.getPassword());
+        assertNotNull(user.getUpdatedAt());
+
+        verify(stringRedisTemplate).opsForValue();
+        verify(valueOperations).get(redisKey);
+        verify(passwordResetAuditRepository).findByToken(token);
+        verify(userRepository).findById(userId);
+        verify(passwordEncoder).encode(newPassword);
+        verify(userRepository).save(user);
+        verify(stringRedisTemplate).delete(redisKey);
+        verify(passwordResetAuditRepository, times(1)).save(argThat(savedAudit ->
+                savedAudit.getStatus().equals("COMPLETED") &&
+                        savedAudit.getCompletedAt() != null &&
+                        savedAudit.getPasswordChangedAt() != null
+        ));
+    }
+
+    @Test
+    void resetPassword_DeveLancarRuntimeException_QuandoAuditoriaNaoExistir() {
+        String token = "reset-token-123";
+        String redisKey = "password-reset:" + token;
+
+        when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get(redisKey)).thenReturn("user-123");
+        when(passwordResetAuditRepository.findByToken(token)).thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> authService.resetPassword(token, "novaSenha123")
+        );
+
+        assertEquals("Auditoria do token não encontrada", exception.getMessage());
+
+        verify(valueOperations).get(redisKey);
+        verify(passwordResetAuditRepository).findByToken(token);
+        verify(userRepository, never()).findById(anyString());
+    }
+
+    @Test
+    void resetPassword_DeveLancarRuntimeExceptionEAtualizarAuditoria_QuandoTokenForInvalidoOuExpirado() {
+        String token = "reset-token-123";
+        String redisKey = "password-reset:" + token;
+
+        PasswordResetAuditEntity audit = PasswordResetAuditEntityStub.buildEntity();
+
+        when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get(redisKey)).thenReturn(null);
+        when(passwordResetAuditRepository.findByToken(token)).thenReturn(Optional.of(audit));
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> authService.resetPassword(token, "novaSenha123")
+        );
+
+        assertEquals("Token inválido ou expirado", exception.getMessage());
+
+        verify(passwordResetAuditRepository).save(argThat(savedAudit ->
+                savedAudit.getStatus().equals("EXPIRED") &&
+                        savedAudit.getFailureReason().equals("Token inválido ou expirado")
+        ));
+        verify(userRepository, never()).findById(anyString());
+        verify(stringRedisTemplate, never()).delete(anyString());
+    }
+
+    @Test
+    void resetPassword_DeveLancarUserNotFoundExceptionEAtualizarAuditoria_QuandoUsuarioNaoExistir() {
+        String token = "reset-token-123";
+        String redisKey = "password-reset:" + token;
+        String userId = "user-123";
+
+        PasswordResetAuditEntity audit = PasswordResetAuditEntityStub.buildEntity();
+
+        when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get(redisKey)).thenReturn(userId);
+        when(passwordResetAuditRepository.findByToken(token)).thenReturn(Optional.of(audit));
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        UserNotFoundException exception = assertThrows(
+                UserNotFoundException.class,
+                () -> authService.resetPassword(token, "novaSenha123")
+        );
+
+        assertEquals("Usuário com ID 'Usuário não encontrado' não encontrado", exception.getMessage());
+        
+        verify(passwordResetAuditRepository).save(argThat(savedAudit ->
+                savedAudit.getStatus().equals("FAILED") &&
+                        savedAudit.getFailureReason().equals("Usuário não encontrado")
+        ));
+        verify(userRepository).findById(userId);
+        verify(userRepository, never()).save(any());
+        verify(stringRedisTemplate, never()).delete(anyString());
+    }
+
+    @Test
+    void login_DeveLancarInvalidCredentialsException_QuandoCpfForNulo() {
+        LoginRequest request = mock(LoginRequest.class);
+
+        when(request.getCpf()).thenReturn(null);
+        when(userRepository.findByCpf(null)).thenReturn(Optional.empty());
+
+        InvalidCredentialsException exception = assertThrows(
+                InvalidCredentialsException.class,
+                () -> authService.login(request)
+        );
+
+        assertEquals("CPF ou senha inválidos", exception.getMessage());
+
+        verify(userRepository).findByCpf(null);
+    }
+
+    @Test
+    void login_DeveLancarInvalidCredentialsException_QuandoCpfForCurto() {
+        LoginRequest request = mock(LoginRequest.class);
+
+        when(request.getCpf()).thenReturn("123");
+        when(userRepository.findByCpf("123")).thenReturn(Optional.empty());
+
+        InvalidCredentialsException exception = assertThrows(
+                InvalidCredentialsException.class,
+                () -> authService.login(request)
+        );
+
+        assertEquals("CPF ou senha inválidos", exception.getMessage());
+
+        verify(userRepository).findByCpf("123");
     }
 }

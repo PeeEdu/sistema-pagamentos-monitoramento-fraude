@@ -24,7 +24,7 @@ public class EmailService {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
-            helper.setFrom("estudosti877@gmail.com", "NexBank");
+            helper.setFrom("no-reply@nexbank.local", "NexBank");
             helper.setTo(to);
             helper.setSubject(subject);
 
