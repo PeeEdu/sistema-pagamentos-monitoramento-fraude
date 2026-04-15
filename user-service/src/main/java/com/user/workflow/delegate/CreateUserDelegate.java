@@ -1,6 +1,6 @@
 package com.user.workflow.delegate;
 
-import com.user.entities.UserEntity;
+import com.user.entity.UserEntity;
 import com.user.repository.UserRepository;
 import com.user.workflow.dto.UserData;
 import com.user.workflow.dto.UserRegistrationData;

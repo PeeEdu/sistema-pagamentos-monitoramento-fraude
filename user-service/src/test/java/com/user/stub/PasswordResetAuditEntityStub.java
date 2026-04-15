@@ -1,6 +1,6 @@
 package com.user.stub;
 
-import com.user.entities.PasswordResetAuditEntity;
+import com.user.entity.PasswordResetAuditEntity;
 
 import java.time.LocalDateTime;
 

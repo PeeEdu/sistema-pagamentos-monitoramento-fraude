@@ -27,6 +27,12 @@ public class HighValueValidator implements FraudValidator {
             riskScore = 40.0;
         }
 
+        if (event.getAmount().compareTo(new BigDecimal(20000)) > 0) {
+            log.warn("⚠️ Valor Exorbitante detectado: {}", event.getAmount());
+            fraudTypes.add(FraudType.HIGH_VALUE);
+            riskScore = 60.0;
+        }
+
         return FraudAnalysisResult.builder()
                 .transferId(event.getTransferId())
                 .isFraud(!fraudTypes.isEmpty())

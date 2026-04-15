@@ -1,6 +1,6 @@
 package com.user.repository;
 
-import com.user.entities.UserEntity;
+import com.user.entity.UserEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

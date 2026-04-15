@@ -49,7 +49,7 @@ jacocoTestCoverageVerification {
             fileTree(dir: it, exclude: [
                     '**/config/**',
                     '**/dto/**',
-                    '**/entities/**',
+                    '**/entity/**',
                     '**/exceptions/**',
                     '**/event/**',
                     '**/repository/**',

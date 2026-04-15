@@ -3,7 +3,7 @@ package com.user.mapper;
 import com.user.dto.request.RegisterRequest;
 import com.user.dto.response.UserCreateResponse;
 import com.user.dto.response.UserResponse;
-import com.user.entities.UserEntity;
+import com.user.entity.UserEntity;
 import com.user.event.UserCreatedEvent;
 import com.user.stub.RegisterRequestStub;
 import com.user.stub.UserEntityStub;

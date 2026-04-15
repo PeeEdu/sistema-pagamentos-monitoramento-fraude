@@ -1,6 +1,6 @@
 package com.user.service;
 
-import com.user.entities.UserEntity;
+import com.user.entity.UserEntity;
 import com.user.repository.UserRepository;
 import com.user.stub.UserEntityStub;
 import org.junit.jupiter.api.Test;

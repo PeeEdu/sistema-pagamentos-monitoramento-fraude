@@ -1,7 +1,7 @@
 package com.user.workflow.mapper;
 
 import com.user.dto.request.RegisterRequest;
-import com.user.entities.UserEntity;
+import com.user.entity.UserEntity;
 import com.user.workflow.dto.UserData;
 import com.user.workflow.dto.UserRegistrationData;
 import org.mapstruct.*;

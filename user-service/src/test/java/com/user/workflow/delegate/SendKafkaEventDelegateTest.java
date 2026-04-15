@@ -1,6 +1,6 @@
 package com.user.workflow.delegate;
 
-import com.user.entities.UserEntity;
+import com.user.entity.UserEntity;
 import com.user.event.UserCreatedEvent;
 import com.user.mapper.UserMapper;
 import com.user.producer.UserEventProducer;

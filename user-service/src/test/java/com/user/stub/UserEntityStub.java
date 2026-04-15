@@ -1,6 +1,6 @@
 package com.user.stub;
 
-import com.user.entities.UserEntity;
+import com.user.entity.UserEntity;
 
 import java.time.Instant;
 

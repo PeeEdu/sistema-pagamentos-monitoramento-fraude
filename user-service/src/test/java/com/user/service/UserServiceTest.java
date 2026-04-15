@@ -1,7 +1,7 @@
 package com.user.service;
 
 import com.user.dto.response.UserResponse;
-import com.user.entities.UserEntity;
+import com.user.entity.UserEntity;
 import com.user.exceptions.UserNotFoundException;
 import com.user.mapper.UserMapper;
 import com.user.repository.UserRepository;

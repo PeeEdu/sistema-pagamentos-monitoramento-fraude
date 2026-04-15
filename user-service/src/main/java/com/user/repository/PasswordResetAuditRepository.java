@@ -1,6 +1,6 @@
 package com.user.repository;
 
-import com.user.entities.PasswordResetAuditEntity;
+import com.user.entity.PasswordResetAuditEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;
